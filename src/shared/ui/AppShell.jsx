@@ -47,11 +47,27 @@ export default function AppShell() {
               BETA
             </span>
           </NavLink>
-          <div className="flex items-center gap-2">
+          {/* Desktop Navigation Links (Visible on tablet & desktop >= 768px) */}
+          <nav aria-label="Desktop Navigation" className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition ${
+                    isActive ? 'bg-teal-900 text-white shadow-xs' : 'text-teal-100 hover:bg-teal-700 hover:text-white'
+                  }`
+                }
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+            <div className="h-4 w-px bg-teal-600/60 mx-1" />
             <NavLink
               to="/history"
               className={({ isActive }) =>
-                `text-xs font-semibold px-2.5 py-1.5 rounded-lg transition ${
+                `text-xs font-semibold px-2.5 py-2 rounded-lg transition ${
                   isActive ? 'bg-teal-900 text-white' : 'text-teal-100 hover:bg-teal-700'
                 }`
               }
@@ -61,7 +77,7 @@ export default function AppShell() {
             <NavLink
               to="/expenses"
               className={({ isActive }) =>
-                `text-xs font-semibold px-2.5 py-1.5 rounded-lg transition ${
+                `text-xs font-semibold px-2.5 py-2 rounded-lg transition ${
                   isActive ? 'bg-teal-900 text-white' : 'text-teal-100 hover:bg-teal-700'
                 }`
               }
@@ -71,7 +87,41 @@ export default function AppShell() {
             <NavLink
               to="/settings"
               className={({ isActive }) =>
-                `text-xs font-semibold px-3 py-1.5 rounded-lg transition ${
+                `text-xs font-semibold px-3 py-2 rounded-lg transition ${
+                  isActive ? 'bg-teal-900 text-white' : 'bg-teal-700 text-white hover:bg-teal-600'
+                }`
+              }
+            >
+              Settings
+            </NavLink>
+          </nav>
+
+          {/* Mobile top-bar secondary links (History, Expenses, Settings) */}
+          <div className="flex md:hidden items-center gap-1.5">
+            <NavLink
+              to="/history"
+              className={({ isActive }) =>
+                `text-xs font-semibold px-2 py-1.5 rounded-lg transition ${
+                  isActive ? 'bg-teal-900 text-white' : 'text-teal-100 hover:bg-teal-700'
+                }`
+              }
+            >
+              History
+            </NavLink>
+            <NavLink
+              to="/expenses"
+              className={({ isActive }) =>
+                `text-xs font-semibold px-2 py-1.5 rounded-lg transition ${
+                  isActive ? 'bg-teal-900 text-white' : 'text-teal-100 hover:bg-teal-700'
+                }`
+              }
+            >
+              Expenses
+            </NavLink>
+            <NavLink
+              to="/settings"
+              className={({ isActive }) =>
+                `text-xs font-semibold px-2.5 py-1.5 rounded-lg transition ${
                   isActive ? 'bg-teal-900 text-white' : 'bg-teal-700 text-white hover:bg-teal-600'
                 }`
               }

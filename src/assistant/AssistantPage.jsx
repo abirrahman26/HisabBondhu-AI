@@ -19,7 +19,53 @@ export default function AssistantPage() {
 
   const [input, setInput] = useState('');
   const [isThinking, setIsThinking] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
+
+  const handleToggleVoice = () => {
+    const SpeechRecognition = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in this browser. Please type your message.');
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'bn-BD';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          setInput(transcript);
+        }
+        setIsListening(false);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
+
 
   const exampleChips = [
     'Kar kache sob theke beshi baki ache?',
@@ -238,15 +284,19 @@ export default function AssistantPage() {
           className="flex-1 px-4 py-3 text-sm bg-white border border-slate-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-700 pr-12 shadow-xs"
         />
 
-        {/* Mic Button (P2 Placeholder) */}
+        {/* Voice Input Mic Button */}
         <button
           type="button"
-          disabled
-          title="Voice input will be available in Phase 6 / Chrome Android"
-          className="p-3 bg-slate-100 text-slate-400 rounded-xl cursor-not-allowed text-base"
-          aria-label="Voice input (P2)"
+          onClick={handleToggleVoice}
+          title={isListening ? 'Listening (কথা বলুন)…' : 'Voice input (Bangla speech)'}
+          className={`p-3 rounded-xl text-base transition flex items-center justify-center min-w-[48px] min-h-[48px] ${
+            isListening
+              ? 'bg-red-600 text-white animate-pulse shadow-md ring-2 ring-red-400'
+              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95'
+          }`}
+          aria-label={isListening ? 'Stop listening' : 'Start voice input in Bangla'}
         >
-          🎤
+          {isListening ? '🔴' : '🎤'}
         </button>
 
         <button

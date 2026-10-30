@@ -18,6 +18,7 @@ export default function DashboardPage() {
     topDebtors,
     isDemoLoaded,
     loadDemo,
+    removeDemo,
     loading,
   } = useData();
 
@@ -36,20 +37,31 @@ export default function DashboardPage() {
     <div className="space-y-5">
       {/* Persistent Demo Banner (D-13) */}
       {isDemoLoaded && (
-        <div className="bg-indigo-700 text-white p-3 rounded-xl shadow-xs flex items-center justify-between text-xs">
+        <div className="bg-indigo-700 text-white p-3 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2">
             <span>⚖️</span>
             <span className="font-semibold">
-              Demo data (fictional) is active for testing & evaluation.
+              Demo data (fictional) is loaded for evaluation.
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => navigate('/settings')}
-            className="bg-white/20 hover:bg-white/30 px-2.5 py-1 rounded-md font-bold transition"
-          >
-            Manage in Settings
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={async () => {
+                await removeDemo();
+              }}
+              className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md font-bold transition shadow-xs"
+            >
+              Remove Demo Data
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/settings')}
+              className="bg-white/20 hover:bg-white/30 px-2.5 py-1 rounded-md font-bold transition"
+            >
+              Settings
+            </button>
+          </div>
         </div>
       )}
 
