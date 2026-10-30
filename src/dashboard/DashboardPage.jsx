@@ -79,11 +79,77 @@ export default function DashboardPage() {
         <div className="flex gap-2">
           <button
             type="button"
+            onClick={() => navigate('/assistant')}
+            className="px-3.5 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-lg font-bold text-sm shadow-xs transition flex items-center gap-1.5"
+          >
+            <span>🤖</span>
+            <span>Ask Chatbot</span>
+          </button>
+          <button
+            type="button"
             onClick={() => navigate('/sell')}
             className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-bold text-sm shadow-xs transition flex items-center gap-1.5"
           >
             <span>⚡</span>
             <span>New Sale</span>
+          </button>
+        </div>
+      </div>
+
+      {/* AI Chatbot Hero Card */}
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-900/60 text-white p-4 rounded-xl shadow-xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <span className="text-3xl p-2 bg-indigo-800/50 rounded-xl">🤖</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="font-extrabold text-base tracking-tight text-white">
+                  হিসাববন্ধু AI Chatbot
+                </h2>
+                <span className="text-[10px] bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 px-2 py-0.5 rounded-full font-semibold">
+                  Gemini 2.5 Flash
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Speak or type in natural Bangla to check sales, debtors, stock, or record baki.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/assistant')}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-xs flex items-center justify-center gap-1.5 shrink-0"
+          >
+            <span>Open Chatbot</span>
+            <span>→</span>
+          </button>
+        </div>
+
+        {/* Quick prompt chips */}
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
+          <button
+            type="button"
+            onClick={() => navigate('/assistant')}
+            className="bg-slate-800/80 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition whitespace-nowrap flex items-center gap-1.5"
+          >
+            <span>💬</span>
+            <span>কার কাছে সবচেয়ে বেশি বাকি?</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/assistant')}
+            className="bg-slate-800/80 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition whitespace-nowrap flex items-center gap-1.5"
+          >
+            <span>💬</span>
+            <span>আজকের বিক্রি কত?</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/assistant')}
+            className="bg-slate-800/80 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition whitespace-nowrap flex items-center gap-1.5"
+          >
+            <span>💬</span>
+            <span>রহিম কে ৫০০ টাকা বাকি দিলাম</span>
           </button>
         </div>
       </div>

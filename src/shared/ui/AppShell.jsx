@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 
 export default function AppShell() {
+  const location = useLocation();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -136,6 +137,18 @@ export default function AppShell() {
       <main className="flex-1 max-w-4xl w-full mx-auto p-4 md:py-6">
         <Outlet />
       </main>
+
+      {/* Floating Chatbot Launcher Button (Visible across all routes except /assistant) */}
+      {location.pathname !== '/assistant' && (
+        <NavLink
+          to="/assistant"
+          className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 bg-indigo-700 hover:bg-indigo-800 text-white font-bold px-4 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm border border-indigo-500/40"
+          aria-label="Open হিসাববন্ধু AI Chatbot"
+        >
+          <span className="text-lg">🤖</span>
+          <span className="font-semibold">হিসাববন্ধু Chatbot</span>
+        </NavLink>
+      )}
 
       {/* Bottom Navigation for Mobile / Fixed Bar */}
       <nav
