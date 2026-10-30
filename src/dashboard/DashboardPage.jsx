@@ -26,21 +26,21 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="py-12 text-center text-slate-400 space-y-2">
-        <span className="text-2xl animate-spin inline-block">⚙️</span>
-        <p className="text-xs font-semibold">Loading shop metrics…</p>
+      <div className="py-16 text-center text-slate-400 space-y-3">
+        <span className="text-3xl animate-spin inline-block">⚙️</span>
+        <p className="text-sm font-semibold tracking-wide">দোকানের হিসাব লোড হচ্ছে…</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Persistent Demo Banner (D-13) */}
       {isDemoLoaded && (
-        <div className="bg-indigo-700 text-white p-3 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="bg-indigo-950/60 border border-indigo-500/30 text-white p-3.5 rounded-2xl shadow-lg flex flex-wrap items-center justify-between gap-2 text-xs backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <span>⚖️</span>
-            <span className="font-semibold">
+            <span className="text-base">⚖️</span>
+            <span className="font-semibold text-slate-200">
               Demo data (fictional) is loaded for evaluation.
             </span>
           </div>
@@ -50,14 +50,14 @@ export default function DashboardPage() {
               onClick={async () => {
                 await removeDemo();
               }}
-              className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md font-bold transition shadow-xs"
+              className="bg-rose-600/80 hover:bg-rose-600 px-3 py-1 rounded-lg font-bold transition shadow-xs text-white"
             >
               Remove Demo Data
             </button>
             <button
               type="button"
               onClick={() => navigate('/settings')}
-              className="bg-white/20 hover:bg-white/30 px-2.5 py-1 rounded-md font-bold transition"
+              className="bg-white/10 hover:bg-white/20 px-3 py-1 rounded-lg font-bold transition text-white"
             >
               Settings
             </button>
@@ -66,21 +66,21 @@ export default function DashboardPage() {
       )}
 
       {/* Welcome / Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
             {shopProfile?.shopName || 'Dashboard'}
           </h1>
-          <p className="text-sm text-slate-500">
-            Welcome, <span className="font-bold text-slate-700">{shopProfile?.ownerName || 'Shopkeeper'}</span> —{' '}
-            <span className="font-semibold text-teal-800">আজকের হিসাব</span>
+          <p className="text-sm text-slate-400 mt-0.5">
+            স্বাগতম, <span className="font-bold text-slate-200">{shopProfile?.ownerName || 'Shopkeeper'}</span> —{' '}
+            <span className="font-bold text-sky-400">আজকের হিসাব ও পর্যালোচনা</span>
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2.5">
           <button
             type="button"
             onClick={() => navigate('/assistant')}
-            className="px-3.5 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-lg font-bold text-sm shadow-xs transition flex items-center gap-1.5"
+            className="px-4 py-2.5 glow-btn-primary rounded-xl font-bold text-sm shadow-md transition flex items-center gap-2"
           >
             <span>🤖</span>
             <span>Ask Chatbot</span>
@@ -88,7 +88,7 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => navigate('/sell')}
-            className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-bold text-sm shadow-xs transition flex items-center gap-1.5"
+            className="px-4 py-2.5 glow-btn-emerald rounded-xl font-bold text-sm shadow-md transition flex items-center gap-2"
           >
             <span>⚡</span>
             <span>New Sale</span>
@@ -97,40 +97,41 @@ export default function DashboardPage() {
       </div>
 
       {/* AI Chatbot Hero Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-900/60 text-white p-4 rounded-xl shadow-xs space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-start gap-3">
-            <span className="text-3xl p-2 bg-indigo-800/50 rounded-xl">🤖</span>
+      <div className="glass-card border border-sky-500/30 p-5 rounded-2xl shadow-2xl space-y-4 relative overflow-hidden">
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
+          <div className="flex items-start gap-3.5">
+            <span className="text-3xl p-2.5 bg-sky-500/10 border border-sky-500/20 rounded-2xl">🤖</span>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-extrabold text-base tracking-tight text-white">
+                <h2 className="font-extrabold text-base sm:text-lg tracking-tight text-white">
                   হিসাববন্ধু AI Chatbot
                 </h2>
-                <span className="text-[10px] bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 px-2 py-0.5 rounded-full font-semibold">
+                <span className="text-[10px] bg-sky-500/20 text-sky-300 border border-sky-400/30 px-2.5 py-0.5 rounded-full font-bold">
                   Gemini 2.5 Flash
                 </span>
               </div>
-              <p className="text-xs text-slate-300 mt-0.5">
-                Speak or type in natural Bangla to check sales, debtors, stock, or record baki.
+              <p className="text-xs sm:text-sm text-slate-300 mt-1">
+                Speak or type in natural Bangla to check sales, debtors, stock, or record baki instantly.
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => navigate('/assistant')}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-xs flex items-center justify-center gap-1.5 shrink-0"
+            className="glow-btn-primary text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-2 shrink-0"
           >
-            <span>Open Chatbot</span>
+            <span>Open Assistant</span>
             <span>→</span>
           </button>
         </div>
 
         {/* Quick prompt chips */}
-        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar text-xs relative z-10">
           <button
             type="button"
             onClick={() => navigate('/assistant')}
-            className="bg-slate-800/80 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition whitespace-nowrap flex items-center gap-1.5"
+            className="bg-slate-900/80 hover:bg-sky-950/80 text-sky-200 border border-sky-500/20 px-3.5 py-2 rounded-xl transition whitespace-nowrap flex items-center gap-2"
           >
             <span>💬</span>
             <span>কার কাছে সবচেয়ে বেশি বাকি?</span>
@@ -138,15 +139,15 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => navigate('/assistant')}
-            className="bg-slate-800/80 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition whitespace-nowrap flex items-center gap-1.5"
+            className="bg-slate-900/80 hover:bg-sky-950/80 text-sky-200 border border-sky-500/20 px-3.5 py-2 rounded-xl transition whitespace-nowrap flex items-center gap-2"
           >
             <span>💬</span>
-            <span>আজকের বিক্রি কত?</span>
+            <span>আজকের বিক্রি ও লাভ কত?</span>
           </button>
           <button
             type="button"
             onClick={() => navigate('/assistant')}
-            className="bg-slate-800/80 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition whitespace-nowrap flex items-center gap-1.5"
+            className="bg-slate-900/80 hover:bg-sky-950/80 text-sky-200 border border-sky-500/20 px-3.5 py-2 rounded-xl transition whitespace-nowrap flex items-center gap-2"
           >
             <span>💬</span>
             <span>রহিম কে ৫০০ টাকা বাকি দিলাম</span>
@@ -155,7 +156,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
         <StatCard
           title="Today's Sales"
           value={formatMoney(todaySalesTotal)}
@@ -200,15 +201,16 @@ export default function DashboardPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Who Owes Most (Top Debtors) */}
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <h3 className="font-bold text-slate-900 text-sm">
-                Who Owes Most (শীর্ষ বাকিদার)
+          <div className="glass-card p-5 rounded-2xl border border-white/10 shadow-lg space-y-3.5">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+              <h3 className="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                <span>📖</span>
+                <span>Who Owes Most (শীর্ষ বাকিদার)</span>
               </h3>
               <button
                 type="button"
                 onClick={() => navigate('/customers')}
-                className="text-xs text-teal-700 font-bold hover:underline"
+                className="text-xs text-sky-400 font-bold hover:underline"
               >
                 View All →
               </button>
@@ -217,18 +219,18 @@ export default function DashboardPage() {
             {topDebtors.length === 0 ? (
               <p className="text-xs text-slate-400 py-6 text-center">No outstanding customer baki.</p>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-white/5">
                 {topDebtors.map((c) => (
                   <div
                     key={c.id}
                     onClick={() => navigate(`/customers/${c.id}`)}
-                    className="py-2.5 flex justify-between items-center text-xs hover:bg-slate-50 cursor-pointer px-1 rounded-sm transition"
+                    className="py-3 flex justify-between items-center text-xs hover:bg-white/5 cursor-pointer px-2 rounded-xl transition"
                   >
                     <div>
-                      <span className="font-bold text-slate-900 block text-sm">{c.name}</span>
+                      <span className="font-bold text-slate-100 block text-sm">{c.name}</span>
                       <span className="text-[11px] text-slate-400 font-mono">{c.phone}</span>
                     </div>
-                    <span className="font-extrabold text-red-700 text-sm tabular-nums">
+                    <span className="font-black text-rose-400 text-sm sm:text-base tabular-nums">
                       {formatMoney(c.balance)}
                     </span>
                   </div>
@@ -238,15 +240,16 @@ export default function DashboardPage() {
           </div>
 
           {/* Low Stock Alerts */}
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <h3 className="font-bold text-slate-900 text-sm">
-                Low Stock Alerts (মজুদ সতর্কতা)
+          <div className="glass-card p-5 rounded-2xl border border-white/10 shadow-lg space-y-3.5">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+              <h3 className="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                <span>⚠️</span>
+                <span>Low Stock Alerts (মজুদ সতর্কতা)</span>
               </h3>
               <button
                 type="button"
                 onClick={() => navigate('/products')}
-                className="text-xs text-teal-700 font-bold hover:underline"
+                className="text-xs text-sky-400 font-bold hover:underline"
               >
                 Catalog →
               </button>
@@ -255,16 +258,16 @@ export default function DashboardPage() {
             {lowStockProducts.length === 0 ? (
               <p className="text-xs text-slate-400 py-6 text-center">All inventory is well-stocked.</p>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-white/5">
                 {lowStockProducts.map((p) => (
-                  <div key={p.id} className="py-2.5 flex justify-between items-center text-xs">
+                  <div key={p.id} className="py-3 flex justify-between items-center text-xs px-2">
                     <div>
-                      <span className="font-bold text-slate-900 block text-sm">{p.name}</span>
+                      <span className="font-bold text-slate-100 block text-sm">{p.name}</span>
                       <span className="text-slate-400 text-[11px]">
                         Alert threshold: {p.lowStockAt} {p.unit}
                       </span>
                     </div>
-                    <span className="bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full font-bold">
+                    <span className="bg-amber-500/20 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-full font-bold">
                       {p.stockQty} {p.unit} left
                     </span>
                   </div>

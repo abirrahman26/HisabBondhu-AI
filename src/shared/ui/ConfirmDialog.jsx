@@ -35,16 +35,16 @@ export default function ConfirmDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="dialog-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md"
     >
-      <div className="bg-white rounded-xl max-w-sm w-full p-5 shadow-xl space-y-4 border border-slate-200">
-        <h3 id="dialog-title" className="text-lg font-bold text-slate-900">
+      <div className="glass-card max-w-sm w-full p-6 rounded-2xl shadow-2xl space-y-4 border border-white/15">
+        <h3 id="dialog-title" className="text-lg font-bold text-white">
           {title}
         </h3>
-        <p className="text-sm text-slate-600">{message}</p>
+        <p className="text-sm text-slate-300">{message}</p>
 
         {warningText && (
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs font-medium text-amber-800">
+          <div className="p-3 bg-amber-950/40 border border-amber-500/40 rounded-xl text-xs font-medium text-amber-200">
             ⚠️ {warningText}
           </div>
         )}
@@ -54,17 +54,17 @@ export default function ConfirmDialog({
             ref={cancelBtnRef}
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
+            className="px-4 py-2 border border-white/15 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 transition"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold text-white transition ${
+            className={`px-4 py-2 rounded-xl text-sm font-bold text-white transition ${
               isDestructive
-                ? 'bg-red-700 hover:bg-red-800'
-                : 'bg-teal-700 hover:bg-teal-800'
+                ? 'bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-900/30'
+                : 'glow-btn-primary'
             }`}
           >
             {confirmLabel}

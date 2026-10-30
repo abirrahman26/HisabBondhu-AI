@@ -21,8 +21,8 @@ export default function MoneyInput({
   };
 
   return (
-    <div className="relative rounded-lg shadow-xs">
-      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 font-bold text-base">
+    <div className="relative rounded-xl shadow-xs">
+      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-400 font-bold text-base">
         ৳
       </div>
       <input
@@ -33,7 +33,7 @@ export default function MoneyInput({
         onChange={handleChange}
         placeholder={placeholder}
         disabled={disabled}
-        className={`block w-full pl-9 pr-3 py-2.5 text-base text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-teal-700 focus:border-teal-700 disabled:bg-slate-100 disabled:text-slate-400 font-semibold tabular-nums ${className}`}
+        className={`block w-full pl-9 pr-3.5 py-2.5 text-base text-slate-100 bg-slate-900/80 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 disabled:bg-slate-950/40 disabled:text-slate-600 font-semibold tabular-nums placeholder-slate-500 transition ${className}`}
         {...props}
       />
     </div>

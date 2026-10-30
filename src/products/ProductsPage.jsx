@@ -75,19 +75,19 @@ export default function ProductsPage() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
             Products Catalog
           </h1>
-          <p className="text-sm text-slate-500">Manage your inventory, prices, and stock alerts</p>
+          <p className="text-sm text-slate-400 mt-0.5">Manage your inventory, prices, and stock alerts</p>
         </div>
         <button
           type="button"
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-bold text-sm rounded-xl shadow-xs transition flex items-center gap-1.5"
+          className="px-4 py-2.5 glow-btn-primary text-white font-bold text-sm rounded-xl shadow-md transition flex items-center gap-1.5"
         >
           <span>{showForm ? 'Close' : '+ Add Product'}</span>
         </button>
@@ -95,20 +95,20 @@ export default function ProductsPage() {
 
       {/* Add Product Form Modal / Sheet */}
       {showForm && (
-        <div className="bg-white p-5 rounded-2xl border-2 border-teal-600 shadow-md space-y-4 animate-in fade-in">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-            <h3 className="text-lg font-bold text-slate-900">Add New Product</h3>
+        <div className="glass-card p-5 sm:p-6 rounded-2xl border-2 border-sky-400/40 shadow-2xl space-y-4 animate-in fade-in">
+          <div className="flex justify-between items-center border-b border-white/10 pb-2.5">
+            <h3 className="text-lg font-bold text-white">Add New Product</h3>
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="text-slate-400 hover:text-slate-600 font-bold"
+              className="text-slate-400 hover:text-white font-bold"
             >
               ✕
             </button>
           </div>
 
           {errors.form && (
-            <p className="p-2 bg-red-50 border border-red-200 text-red-700 rounded-lg text-xs font-semibold">
+            <p className="p-3 bg-rose-950/40 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-semibold">
               ⚠️ {errors.form}
             </p>
           )}
@@ -121,7 +121,7 @@ export default function ProductsPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Sugar (চিনি)"
-                  className="w-full px-3.5 py-2.5 text-base border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-teal-700"
+                  className="w-full px-3.5 py-2.5 text-base border border-white/15 rounded-xl bg-slate-900 text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
                 />
               </FormField>
 
@@ -131,7 +131,7 @@ export default function ProductsPage() {
                   value={aliasStr}
                   onChange={(e) => setAliasStr(e.target.value)}
                   placeholder="e.g. chini, shugor"
-                  className="w-full px-3.5 py-2.5 text-base border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-teal-700"
+                  className="w-full px-3.5 py-2.5 text-base border border-white/15 rounded-xl bg-slate-900 text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
                 />
               </FormField>
             </div>
@@ -141,7 +141,7 @@ export default function ProductsPage() {
                 <select
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-base border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-teal-700 bg-white"
+                  className="w-full px-3.5 py-2.5 text-base border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400 bg-slate-900 text-white"
                 >
                   <option value="kg">kg (কেজি)</option>
                   <option value="litre">litre (লিটার)</option>
@@ -183,14 +183,14 @@ export default function ProductsPage() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition"
+                className="px-4 py-2 border border-white/15 text-slate-300 font-semibold rounded-xl hover:bg-white/10 transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg transition shadow-xs disabled:opacity-50"
+                className="px-6 py-2 glow-btn-primary font-bold rounded-xl transition shadow-md disabled:opacity-50"
               >
                 {saving ? 'Saving…' : 'Save Product'}
               </button>
@@ -206,9 +206,9 @@ export default function ProductsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search products by name, বাংলা or Banglish…"
-          className="w-full px-4 py-2.5 pl-10 text-sm bg-white border border-slate-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-700 shadow-xs"
+          className="w-full px-4 py-3 pl-10 text-sm glass-input rounded-xl shadow-md text-slate-100 placeholder-slate-500"
         />
-        <span className="absolute left-3.5 top-3 text-slate-400">🔍</span>
+        <span className="absolute left-3.5 top-3.5 text-slate-400">🔍</span>
       </div>
 
       {/* Product List */}
@@ -223,40 +223,40 @@ export default function ProductsPage() {
           onAction={() => setShowForm(true)}
         />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
           {filteredProducts.map((p) => {
             const isLowStock = Number(p.stockQty) <= Number(p.lowStockAt);
             return (
               <div
                 key={p.id}
-                className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between space-y-3"
+                className="glass-card p-5 rounded-2xl border border-white/10 shadow-lg flex flex-col justify-between space-y-3.5 hover:border-sky-500/40 transition"
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-bold text-slate-900 text-base leading-snug">{p.name}</h3>
+                    <h3 className="font-bold text-white text-base leading-snug">{p.name}</h3>
                     {p.aliases && p.aliases.length > 0 && (
-                      <p className="text-xs text-slate-400">({p.aliases.join(', ')})</p>
+                      <p className="text-xs text-slate-400 mt-0.5 font-mono">({p.aliases.join(', ')})</p>
                     )}
                   </div>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                    className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
                       isLowStock
-                        ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                        : 'bg-slate-100 text-slate-700'
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30'
+                        : 'bg-white/10 text-slate-300'
                     }`}
                   >
                     {p.stockQty} {p.unit}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center pt-2 border-t border-slate-100 text-xs">
+                <div className="flex justify-between items-center pt-2.5 border-t border-white/10 text-xs">
                   <div>
-                    <span className="text-slate-500">Sell: </span>
-                    <span className="font-extrabold text-teal-800 text-sm">{formatMoney(p.sellPrice)}</span>
+                    <span className="text-slate-400">Sell: </span>
+                    <span className="font-black text-sky-400 text-sm tabular-nums">{formatMoney(p.sellPrice)}</span>
                   </div>
                   <div>
                     <span className="text-slate-400">Cost: </span>
-                    <span className="font-semibold text-slate-600">{formatMoney(p.buyPrice)}</span>
+                    <span className="font-semibold text-slate-300 tabular-nums">{formatMoney(p.buyPrice)}</span>
                   </div>
                 </div>
               </div>

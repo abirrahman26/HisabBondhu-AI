@@ -8,31 +8,31 @@ export default function StatCard({
   variant = 'default',
 }) {
   const variantStyles = {
-    default: 'bg-white border-slate-200 text-slate-900',
-    warning: 'bg-amber-50 border-amber-200 text-amber-900',
-    danger: 'bg-red-50 border-red-200 text-red-900',
-    success: 'bg-green-50 border-green-200 text-green-900',
-    teal: 'bg-teal-50 border-teal-200 text-teal-900',
+    default: 'border-white/10 text-slate-100 hover:border-sky-500/30',
+    warning: 'border-amber-500/30 text-amber-200 bg-amber-950/20 hover:border-amber-400/50',
+    danger: 'border-rose-500/30 text-rose-200 bg-rose-950/20 hover:border-rose-400/50',
+    success: 'border-emerald-500/30 text-emerald-200 bg-emerald-950/20 hover:border-emerald-400/50',
+    teal: 'border-cyan-500/30 text-cyan-200 bg-cyan-950/20 hover:border-cyan-400/50',
   };
 
   return (
     <div
-      className={`p-4 rounded-xl border shadow-xs flex flex-col justify-between ${
+      className={`glass-card p-4 rounded-2xl flex flex-col justify-between ${
         variantStyles[variant] || variantStyles.default
       }`}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
           {title}
         </span>
-        {icon && <span className="text-lg">{icon}</span>}
+        {icon && <span className="text-xl p-1 rounded-lg bg-white/5">{icon}</span>}
       </div>
       <div>
-        <div className="text-2xl font-bold tracking-tight tabular-nums">
+        <div className="text-2xl font-black tracking-tight tabular-nums text-white">
           {value}
         </div>
         {subtitle && (
-          <p className="text-xs text-slate-500 mt-1">{subtitle}</p>
+          <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
         )}
       </div>
     </div>

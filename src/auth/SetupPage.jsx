@@ -52,22 +52,25 @@ export default function SetupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-8 text-slate-100">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-2">
-        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-          Shop Setup
+        <div className="inline-flex p-3 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 text-3xl mb-2 animate-float">
+          ✨
+        </div>
+        <h2 className="text-3xl font-black text-white tracking-tight">
+          Shop Setup (দোকানের তথ্য)
         </h2>
-        <p className="text-sm text-slate-600">
-          Tell us about your business to personalize your assistant
+        <p className="text-sm text-slate-400">
+          Tell us about your business to personalize your digital assistant
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-sm border border-slate-200 rounded-2xl">
+        <div className="glass-panel py-8 px-6 sm:px-8 shadow-2xl border border-white/10 rounded-3xl">
           {serverError && (
             <div
               role="alert"
-              className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-semibold text-red-800 mb-4"
+              className="p-3.5 bg-rose-950/40 border border-rose-500/40 rounded-xl text-xs font-semibold text-rose-300 mb-4"
             >
               ⚠️ {serverError}
             </div>
@@ -83,7 +86,7 @@ export default function SetupPage() {
                   if (errors.shopName) setErrors((prev) => ({ ...prev, shopName: undefined }));
                 }}
                 placeholder="e.g. Rahima Store"
-                className="w-full px-3.5 py-2.5 text-base text-slate-900 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-teal-700"
+                className="w-full px-3.5 py-2.5 text-base text-slate-100 border border-white/15 rounded-xl bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400"
               />
             </FormField>
 
@@ -96,7 +99,7 @@ export default function SetupPage() {
                   if (errors.ownerName) setErrors((prev) => ({ ...prev, ownerName: undefined }));
                 }}
                 placeholder="e.g. Md. Rahima"
-                className="w-full px-3.5 py-2.5 text-base text-slate-900 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-teal-700"
+                className="w-full px-3.5 py-2.5 text-base text-slate-100 border border-white/15 rounded-xl bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400"
               />
             </FormField>
 
@@ -116,14 +119,14 @@ export default function SetupPage() {
                   if (errors.phone) setErrors((prev) => ({ ...prev, phone: undefined }));
                 }}
                 placeholder="01700000000"
-                className="w-full px-3.5 py-2.5 text-base text-slate-900 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-teal-700 font-mono"
+                className="w-full px-3.5 py-2.5 text-base text-slate-100 border border-white/15 rounded-xl bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 font-mono"
               />
             </FormField>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-4 py-3 px-4 bg-teal-700 hover:bg-teal-800 text-white font-bold text-base rounded-xl transition shadow-xs disabled:opacity-50"
+              className="w-full mt-4 py-3 px-4 glow-btn-primary text-white font-bold text-base rounded-xl transition shadow-lg disabled:opacity-50"
             >
               {loading ? 'Setting up…' : 'Complete Setup & Go to Dashboard'}
             </button>

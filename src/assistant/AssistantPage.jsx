@@ -12,7 +12,7 @@ export default function AssistantPage() {
     {
       id: 'm1',
       sender: 'ai',
-      text: 'আসসালামু আলাইকুম! আমি আপনার ডিজিটাল হিসাববন্ধু। আপনার দোকানের বিক্রি, বাকি বা স্টক সম্পর্কে বাংলায় প্রশ্ন করুন অথবা নির্দেশ দিন।',
+      text: 'আসসালামু আলাইকুম! আমি আপনার ডিজিটাল হিসাববন্ধু AI। আপনার দোকানের বিক্রি, লাভ, বাকি বা স্টক সম্পর্কে বাংলায় প্রশ্ন করুন অথবা নির্দেশ দিন।',
       timestamp: '10:00 AM',
     },
   ]);
@@ -66,12 +66,11 @@ export default function AssistantPage() {
     }
   };
 
-
   const exampleChips = [
-    'Kar kache sob theke beshi baki ache?',
-    'Aj koto bikri holo?',
-    'Ki ki jinis shesh hoye ashche?',
-    'Rahim ke 500 taka baki dilam',
+    'কার কাছে সবচেয়ে বেশি বাকি?',
+    'আজকে কত বিক্রি হলো?',
+    'কোন কোন জিনিস শেষ হয়ে আসছে?',
+    'রহিম কে ৫০০ টাকা বাকি দিলাম',
   ];
 
   const scrollToBottom = () => {
@@ -180,24 +179,24 @@ export default function AssistantPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] max-w-2xl mx-auto">
+    <div className="flex flex-col h-[calc(100vh-140px)] max-w-2xl mx-auto space-y-3">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-200 flex justify-between items-center">
+      <div className="pb-3 border-b border-white/10 flex justify-between items-center">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2.5">
             <span>হিসাববন্ধু AI Assistant</span>
-            <span className="text-xs bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">
-              Gemini Powered
+            <span className="text-xs bg-sky-500/20 text-sky-300 border border-sky-400/30 font-bold px-2.5 py-0.5 rounded-full">
+              Gemini 2.5 Flash
             </span>
           </h1>
-          <p className="text-xs text-slate-500">
-            Bangla business conversation, allowlisted tools & propose-confirm safety
+          <p className="text-xs text-slate-400 mt-0.5">
+            Bangla business conversation, allowlisted tools & zero-math hallucination safety
           </p>
         </div>
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto py-4 space-y-4 px-1" role="log" aria-live="polite">
+      <div className="flex-1 overflow-y-auto py-3 space-y-4 px-1" role="log" aria-live="polite">
         {messages.map((m) => {
           const isUser = m.sender === 'user';
           return (
@@ -207,7 +206,7 @@ export default function AssistantPage() {
             >
               <div className="flex items-center gap-1.5 mb-1 text-[11px] text-slate-400">
                 {!isUser && (
-                  <span className="bg-indigo-700 text-white font-extrabold px-1.5 py-0.2 rounded-xs text-[9px]">
+                  <span className="bg-sky-500/20 text-sky-300 border border-sky-400/30 font-extrabold px-1.5 py-0.2 rounded-xs text-[9px]">
                     AI
                   </span>
                 )}
@@ -216,10 +215,10 @@ export default function AssistantPage() {
               </div>
 
               <div
-                className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                   isUser
-                    ? 'bg-teal-700 text-white rounded-tr-xs shadow-xs'
-                    : 'bg-white text-slate-800 border border-slate-200 rounded-tl-xs shadow-xs'
+                    ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-tr-xs shadow-lg border border-sky-400/30'
+                    : 'glass-card text-slate-100 border border-white/10 rounded-tl-xs shadow-lg'
                 }`}
                 lang={!isUser ? 'bn' : undefined}
               >
@@ -228,7 +227,7 @@ export default function AssistantPage() {
 
               {/* Verified Data Card if available */}
               {m.verifiedData && (
-                <div className="max-w-[85%] w-full">
+                <div className="max-w-[88%] w-full">
                   <VerifiedDataCard
                     title={m.verifiedData.title}
                     data={m.verifiedData.items}
@@ -239,7 +238,7 @@ export default function AssistantPage() {
 
               {/* Propose-Confirm Card if available */}
               {m.proposal && (
-                <div className="max-w-[85%] w-full">
+                <div className="max-w-[88%] w-full">
                   <ConfirmationCard
                     proposal={m.proposal}
                     onConfirm={handleConfirmProposal}
@@ -252,22 +251,22 @@ export default function AssistantPage() {
         })}
 
         {isThinking && (
-          <div className="flex items-center gap-2 text-xs text-slate-400 italic py-2">
-            <span className="animate-spin">⚙️</span>
-            <span>হিসাববন্ধু তথ্য যাচাই করছে… (Thinking)</span>
+          <div className="flex items-center gap-2.5 text-xs text-sky-300 italic py-2 px-1">
+            <span className="animate-spin inline-block">⚙️</span>
+            <span>হিসাববন্ধু তথ্য যাচাই করছে… (Analyzing with Gemini 2.5 Flash)</span>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Example Chips */}
-      <div className="py-2 flex gap-1.5 overflow-x-auto no-scrollbar">
+      <div className="py-1 flex gap-2 overflow-x-auto no-scrollbar">
         {exampleChips.map((chip, idx) => (
           <button
             key={idx}
             type="button"
             onClick={() => setInput(chip)}
-            className="shrink-0 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3 py-1.5 rounded-full border border-slate-200 transition"
+            className="shrink-0 text-xs bg-slate-900/80 hover:bg-sky-950/80 text-sky-200 font-medium px-3.5 py-1.5 rounded-full border border-sky-500/20 transition whitespace-nowrap"
           >
             {chip}
           </button>
@@ -275,13 +274,13 @@ export default function AssistantPage() {
       </div>
 
       {/* Input Box */}
-      <form onSubmit={handleSend} className="relative flex items-center gap-2 pt-2">
+      <form onSubmit={handleSend} className="relative flex items-center gap-2 pt-1">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="বাংলায় বলুন বা লিখুন (e.g. Rahim ke 500 taka baki dilam)…"
-          className="flex-1 px-4 py-3 text-sm bg-white border border-slate-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-700 pr-12 shadow-xs"
+          placeholder="বাংলায় বলুন বা লিখুন (যেমন: রহিম কে ৫০০ টাকা বাকি দিলাম)…"
+          className="flex-1 px-4 py-3 text-sm glass-input rounded-xl placeholder-slate-500 text-slate-100 pr-12 shadow-md"
         />
 
         {/* Voice Input Mic Button */}
@@ -291,8 +290,8 @@ export default function AssistantPage() {
           title={isListening ? 'Listening (কথা বলুন)…' : 'Voice input (Bangla speech)'}
           className={`p-3 rounded-xl text-base transition flex items-center justify-center min-w-[48px] min-h-[48px] ${
             isListening
-              ? 'bg-red-600 text-white animate-pulse shadow-md ring-2 ring-red-400'
-              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95'
+              ? 'bg-rose-600 text-white animate-pulse shadow-xl ring-2 ring-rose-400'
+              : 'bg-white/10 hover:bg-white/15 text-slate-200 active:scale-95 border border-white/10'
           }`}
           aria-label={isListening ? 'Stop listening' : 'Start voice input in Bangla'}
         >
@@ -302,7 +301,7 @@ export default function AssistantPage() {
         <button
           type="submit"
           disabled={!input.trim()}
-          className="px-4 py-3 bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white font-bold rounded-xl shadow-xs transition"
+          className="px-5 py-3 glow-btn-primary disabled:opacity-40 text-white font-bold rounded-xl shadow-lg transition"
           aria-label="Send message"
         >
           Send

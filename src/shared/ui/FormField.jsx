@@ -12,13 +12,13 @@ export default function FormField({
   const errorId = error ? `${id}-error` : undefined;
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <div className="flex justify-between items-center">
-        <label htmlFor={id} className="block text-sm font-semibold text-slate-800">
-          {label} {required && <span className="text-red-600 font-bold">*</span>}
+        <label htmlFor={id} className="block text-sm font-semibold text-slate-200">
+          {label} {required && <span className="text-rose-400 font-bold">*</span>}
         </label>
         {hint && (
-          <span id={hintId} className="text-xs text-slate-500">
+          <span id={hintId} className="text-xs text-slate-400">
             {hint}
           </span>
         )}
@@ -32,8 +32,9 @@ export default function FormField({
       })}
 
       {error && (
-        <p id={errorId} className="text-xs font-medium text-red-600 mt-1" role="alert">
-          {error}
+        <p id={errorId} className="text-xs font-semibold text-rose-400 mt-1 flex items-center gap-1" role="alert">
+          <span>⚠️</span>
+          <span>{error}</span>
         </p>
       )}
     </div>

@@ -1,10 +1,117 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --primary-sky: #38bdf8;
+    --primary-blue: #2563eb;
+    --primary-deep: #1d4ed8;
+    --accent-cyan: #22d3ee;
+    --accent-gold: #fbbf24;
+    --accent-emerald: #10b981;
+    --bg-dark: #061126;
+    --bg-dark-card: rgba(12, 27, 55, 0.85);
+    --line-subtle: rgba(255, 255, 255, 0.08);
+  }
+
   html {
-    font-family: 'Inter', 'Noto Sans Bengali', 'Hind Siliguri', system-ui, -apple-system, sans-serif;
+    font-family: 'Hind Siliguri', 'Inter', 'Noto Sans Bengali', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    background-color: #061126;
+    color: #f8fafc;
+  }
+
+  body {
+    background: 
+      radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.12), transparent 35%),
+      radial-gradient(circle at 90% 12%, rgba(37, 99, 235, 0.16), transparent 35%),
+      radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.08), transparent 35%),
+      linear-gradient(180deg, #061126 0%, #081a36 50%, #061126 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #f8fafc;
   }
 }
 
+/* Glassmorphism & Modern UI utilities */
+.glass-panel {
+  background: rgba(12, 27, 55, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.glass-card {
+  background: rgba(15, 31, 62, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(56, 189, 248, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), 0 0 20px rgba(56, 189, 248, 0.1);
+}
+
+.glass-input {
+  background: rgba(8, 22, 48, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+  background: rgba(10, 28, 60, 0.95);
+}
+
+.glow-btn-primary {
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);
+  transition: all 0.25s ease;
+}
+
+.glow-btn-primary:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #1d4ed8 100%);
+  box-shadow: 0 6px 25px rgba(56, 189, 248, 0.45);
+  transform: translateY(-1px);
+}
+
+.glow-btn-emerald {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  transition: all 0.25s ease;
+}
+
+.glow-btn-emerald:hover {
+  box-shadow: 0 6px 22px rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Smooth floating animations */
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s infinite ease-in-out;
+}
+
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-float {
+  animation: floatGentle 4s infinite ease-in-out;
+}

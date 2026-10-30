@@ -142,25 +142,25 @@ export default function SellPage() {
   }
 
   return (
-    <div className="max-w-xl mx-auto space-y-5">
+    <div className="max-w-xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
           Record Sale (বিক্রি হিসাব)
         </h1>
-        <p className="text-sm text-slate-500">Atomic inventory decrement and baki khata logging</p>
+        <p className="text-sm text-slate-400 mt-0.5">Atomic inventory decrement and baki khata logging</p>
       </div>
 
       {savedSuccess ? (
-        <div className="bg-white p-6 rounded-2xl border-2 border-green-500 shadow-md text-center space-y-4 animate-in fade-in">
-          <div className="text-4xl text-green-600">✓</div>
+        <div className="glass-card p-6 rounded-2xl border-2 border-emerald-500/50 shadow-2xl text-center space-y-4 animate-in fade-in">
+          <div className="text-4xl text-emerald-400 animate-bounce">✓</div>
           <div className="space-y-1">
-            <h3 className="text-xl font-bold text-slate-900">Sale Recorded Successfully!</h3>
-            <p className="text-sm text-slate-600">
+            <h3 className="text-xl font-bold text-white">Sale Recorded Successfully!</h3>
+            <p className="text-sm text-slate-300">
               {savedSuccess.qty} {savedSuccess.unit} {savedSuccess.productName} for{' '}
-              <strong className="text-teal-800">{formatMoney(savedSuccess.total)}</strong>
+              <strong className="text-sky-400">{formatMoney(savedSuccess.total)}</strong>
             </p>
-            <p className="text-xs text-slate-500">
-              Payment: <span className="font-semibold uppercase">{savedSuccess.paymentType}</span> (
+            <p className="text-xs text-slate-400">
+              Payment: <span className="font-semibold uppercase text-emerald-300">{savedSuccess.paymentType}</span> (
               {savedSuccess.customerName})
             </p>
           </div>
@@ -172,23 +172,23 @@ export default function SellPage() {
                 setQty('1');
                 setNegativeStockAccepted(false);
               }}
-              className="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg transition"
+              className="px-5 py-2.5 glow-btn-emerald font-bold rounded-xl transition shadow-lg"
             >
               + Another Sale
             </button>
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="px-4 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-lg transition"
+              className="px-4 py-2.5 border border-white/15 hover:bg-white/10 text-slate-300 font-semibold rounded-xl transition"
             >
               Go to Dashboard
             </button>
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSave} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+        <form onSubmit={handleSave} className="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 shadow-2xl space-y-5">
           {errors.form && (
-            <p className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
+            <p className="p-3 bg-rose-950/40 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-semibold">
               ⚠️ {errors.form}
             </p>
           )}
@@ -198,7 +198,7 @@ export default function SellPage() {
             <select
               value={selectedProductId}
               onChange={handleProductChange}
-              className="w-full px-3.5 py-2.5 text-base border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-teal-700 bg-white font-medium"
+              className="w-full px-3.5 py-2.5 text-base border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400 bg-slate-900 text-white font-medium"
             >
               {products.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -232,16 +232,16 @@ export default function SellPage() {
 
           {/* Negative Stock Warning */}
           {isStockLowOrNegative && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
-              <p className="text-xs font-semibold text-amber-900">
+            <div className="p-3 bg-amber-950/40 border border-amber-500/40 rounded-xl space-y-2">
+              <p className="text-xs font-semibold text-amber-200">
                 ⚠️ Only {selectedProduct?.stockQty} {selectedProduct?.unit} left in stock. You are selling {qty} {selectedProduct?.unit}.
               </p>
-              <label className="flex items-center gap-2 text-xs font-medium text-amber-800 cursor-pointer">
+              <label className="flex items-center gap-2 text-xs font-medium text-amber-300 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={negativeStockAccepted}
                   onChange={(e) => setNegativeStockAccepted(e.target.checked)}
-                  className="rounded-sm text-teal-700 focus:ring-teal-700"
+                  className="rounded-sm text-sky-500 focus:ring-sky-400"
                 />
                 <span>I understand and want to sell anyway (Negative stock accepted)</span>
               </label>
@@ -249,11 +249,11 @@ export default function SellPage() {
           )}
 
           {/* Payment Type Selection */}
-          <div className="space-y-1">
-            <label className="block text-sm font-semibold text-slate-800">
-              Payment Method (মূল্য পরিশোধ পদ্ধতি) <span className="text-red-600">*</span>
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-200">
+              Payment Method (মূল্য পরিশোধ পদ্ধতি) <span className="text-rose-400">*</span>
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2.5">
               {[
                 { type: 'cash', label: 'Cash (নগদ)' },
                 { type: 'mobile_banking', label: 'bKash/Nagad' },
@@ -263,10 +263,10 @@ export default function SellPage() {
                   key={m.type}
                   type="button"
                   onClick={() => setPaymentType(m.type)}
-                  className={`py-2.5 px-3 rounded-xl border text-sm font-bold transition text-center ${
+                  className={`py-3 px-3 rounded-xl border text-sm font-bold transition text-center ${
                     paymentType === m.type
-                      ? 'border-teal-700 bg-teal-50 text-teal-900 shadow-xs ring-1 ring-teal-700'
-                      : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                      ? 'border-sky-400 bg-sky-500/20 text-sky-200 shadow-md ring-1 ring-sky-400'
+                      : 'border-white/10 bg-slate-900/60 text-slate-300 hover:bg-white/5'
                   }`}
                 >
                   {m.label}
@@ -283,10 +283,10 @@ export default function SellPage() {
                   key={wallet}
                   type="button"
                   onClick={() => setPaymentLabel(wallet)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition ${
                     paymentLabel === wallet
-                      ? 'bg-indigo-700 text-white'
-                      : 'bg-slate-100 text-slate-600'
+                      ? 'glow-btn-primary text-white'
+                      : 'bg-white/10 text-slate-300 hover:bg-white/15'
                   }`}
                 >
                   {wallet}
@@ -297,13 +297,13 @@ export default function SellPage() {
 
           {/* Baki Customer Selector / Inline Add */}
           {paymentType === 'baki' && (
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <div className="p-4 bg-slate-900/70 rounded-xl border border-white/10 space-y-3.5">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-slate-800">Baki Customer</span>
+                <span className="text-sm font-bold text-slate-200">Baki Customer</span>
                 <button
                   type="button"
                   onClick={() => setShowNewCustomer(!showNewCustomer)}
-                  className="text-xs font-bold text-teal-700 hover:underline"
+                  className="text-xs font-bold text-sky-400 hover:underline"
                 >
                   {showNewCustomer ? 'Choose Existing' : '+ Add New Customer'}
                 </button>
@@ -317,7 +317,7 @@ export default function SellPage() {
                       value={newCustName}
                       onChange={(e) => setNewCustName(e.target.value)}
                       placeholder="e.g. Rahim"
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white"
+                      className="w-full px-3.5 py-2 text-sm border border-white/15 rounded-xl bg-slate-900 text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
                     />
                   </FormField>
                   <FormField id="newCustPhone" label="Mobile Phone" required hint="11 digits" error={errors.custPhone}>
@@ -326,7 +326,7 @@ export default function SellPage() {
                       value={newCustPhone}
                       onChange={(e) => setNewCustPhone(e.target.value)}
                       placeholder="01700000001"
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white font-mono"
+                      className="w-full px-3.5 py-2 text-sm border border-white/15 rounded-xl bg-slate-900 text-white font-mono focus:outline-none focus:ring-2 focus:ring-sky-400"
                     />
                   </FormField>
                 </div>
@@ -335,7 +335,7 @@ export default function SellPage() {
                   <select
                     value={selectedCustomerId}
                     onChange={(e) => setSelectedCustomerId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-base border border-slate-300 rounded-lg bg-white font-medium"
+                    className="w-full px-3.5 py-2.5 text-base border border-white/15 rounded-xl bg-slate-900 text-white font-medium focus:outline-none focus:ring-2 focus:ring-sky-400"
                   >
                     <option value="">-- Choose Customer --</option>
                     {customers.map((c) => (
@@ -350,17 +350,17 @@ export default function SellPage() {
           )}
 
           {/* Summary Banner */}
-          <div className="pt-3 border-t border-slate-200 flex justify-between items-center">
+          <div className="pt-4 border-t border-white/10 flex justify-between items-center">
             <div>
-              <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Total Amount</span>
-              <div className="text-2xl font-extrabold text-teal-800 tabular-nums">
+              <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total Amount</span>
+              <div className="text-2xl sm:text-3xl font-black text-sky-400 tabular-nums">
                 {formatMoney(lineTotal)}
               </div>
             </div>
             <button
               type="submit"
               disabled={saving}
-              className="py-3 px-6 bg-teal-700 hover:bg-teal-800 text-white font-bold text-base rounded-xl transition shadow-xs disabled:opacity-50"
+              className="py-3 px-6 glow-btn-emerald text-white font-bold text-base rounded-xl transition shadow-lg disabled:opacity-50"
             >
               {saving ? 'Processing…' : 'Complete Sale'}
             </button>

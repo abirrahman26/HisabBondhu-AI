@@ -51,51 +51,51 @@ export default function ExpensesPage() {
   };
 
   return (
-    <div className="space-y-4 max-w-xl mx-auto">
+    <div className="space-y-5 max-w-xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
             Expenses (দোকানের খরচ)
           </h1>
-          <p className="text-sm text-slate-500">Record operational costs to compute net profit</p>
+          <p className="text-sm text-slate-400 mt-0.5">Record operational costs to compute net profit</p>
         </div>
         <button
           type="button"
           onClick={() => setShowAdd(!showAdd)}
-          className="px-4 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-bold text-sm rounded-xl shadow-xs transition flex items-center gap-1.5"
+          className="px-4 py-2.5 glow-btn-primary text-white font-bold text-sm rounded-xl shadow-md transition flex items-center gap-1.5"
         >
           <span>{showAdd ? 'Close' : '+ Add Expense'}</span>
         </button>
       </div>
 
       {/* Total Card */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
+      <div className="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 shadow-xl flex justify-between items-center">
         <div>
           <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">
-            Total Recorded Expenses
+            Total Recorded Expenses (মোট খরচ)
           </span>
-          <div className="text-3xl font-extrabold text-slate-900 tabular-nums mt-0.5">
+          <div className="text-3xl font-black text-rose-400 tabular-nums mt-1">
             {formatMoney(totalExpenses)}
           </div>
         </div>
-        <span className="text-2xl">🧾</span>
+        <span className="text-3xl p-2 bg-white/5 rounded-2xl border border-white/10">🧾</span>
       </div>
 
       {/* Add Expense Form */}
       {showAdd && (
-        <div className="bg-white p-5 rounded-2xl border-2 border-teal-600 shadow-md space-y-4 animate-in fade-in">
-          <h3 className="text-lg font-bold text-slate-900">Add Shop Expense</h3>
+        <div className="glass-card p-5 sm:p-6 rounded-2xl border-2 border-sky-400/40 shadow-2xl space-y-4 animate-in fade-in">
+          <h3 className="text-lg font-bold text-white">Add Shop Expense</h3>
           {errors.form && (
-            <p className="p-2.5 bg-red-50 border border-red-200 text-red-700 rounded-lg text-xs font-semibold">
+            <p className="p-3 bg-rose-950/40 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-semibold">
               ⚠️ {errors.form}
             </p>
           )}
-          <form onSubmit={handleAdd} className="space-y-3" noValidate>
+          <form onSubmit={handleAdd} className="space-y-4" noValidate>
             <FormField id="category" label="Category (খরচের খাত)" required>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-base border border-slate-300 rounded-lg bg-white"
+                className="w-full px-3.5 py-2.5 text-base border border-white/15 rounded-xl bg-slate-900 text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
               >
                 <option value="rent">Shop Rent (দোকান ভাড়া)</option>
                 <option value="electricity">Electricity (বিদ্যুৎ বিল)</option>
@@ -115,7 +115,7 @@ export default function ExpensesPage() {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="e.g. October electric bill"
-                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg"
+                className="w-full px-3.5 py-2.5 text-sm glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400 text-white placeholder-slate-500"
               />
             </FormField>
 
@@ -123,14 +123,14 @@ export default function ExpensesPage() {
               <button
                 type="button"
                 onClick={() => setShowAdd(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition"
+                className="px-4 py-2 border border-white/15 text-slate-300 font-semibold rounded-xl hover:bg-white/10 transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg transition shadow-xs disabled:opacity-50"
+                className="px-6 py-2 glow-btn-primary font-bold rounded-xl transition shadow-md disabled:opacity-50"
               >
                 {saving ? 'Saving…' : 'Save Expense'}
               </button>
@@ -151,17 +151,17 @@ export default function ExpensesPage() {
           onAction={() => setShowAdd(true)}
         />
       ) : (
-        <div className="divide-y divide-slate-100 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="divide-y divide-white/5 glass-card rounded-2xl border border-white/10 shadow-lg overflow-hidden">
           {expenses.map((exp) => (
-            <div key={exp.id} className="p-4 flex justify-between items-center text-sm">
+            <div key={exp.id} className="p-4 flex justify-between items-center text-sm hover:bg-white/5 transition">
               <div className="space-y-0.5">
-                <span className="font-bold text-slate-900 block">
+                <span className="font-bold text-white block">
                   {categoryLabels[exp.category] || exp.category}
                 </span>
-                {exp.note && <p className="text-xs text-slate-600">{exp.note}</p>}
-                <p className="text-[11px] text-slate-400">{exp.dateKey}</p>
+                {exp.note && <p className="text-xs text-slate-400">{exp.note}</p>}
+                <p className="text-[11px] text-slate-500 font-mono">{exp.dateKey}</p>
               </div>
-              <div className="text-right font-extrabold text-base text-red-700 tabular-nums">
+              <div className="text-right font-black text-base text-rose-400 tabular-nums">
                 -{formatMoney(exp.amount)}
               </div>
             </div>

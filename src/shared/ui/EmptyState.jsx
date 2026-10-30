@@ -10,18 +10,20 @@ export default function EmptyState({
   onSecondaryAction,
 }) {
   return (
-    <div className="text-center py-12 px-4 bg-white rounded-xl border border-slate-200 shadow-xs max-w-lg mx-auto space-y-4">
-      <div className="text-4xl">{icon}</div>
-      <div className="space-y-1">
-        <h3 className="text-lg font-bold text-slate-800">{title}</h3>
-        {description && <p className="text-sm text-slate-500">{description}</p>}
+    <div className="glass-card text-center py-12 px-6 rounded-2xl max-w-lg mx-auto space-y-4 border border-white/10 shadow-2xl">
+      <div className="text-4xl p-3 bg-white/5 rounded-2xl w-fit mx-auto border border-white/10 animate-float">
+        {icon}
+      </div>
+      <div className="space-y-1.5">
+        <h3 className="text-lg font-bold text-slate-100">{title}</h3>
+        {description && <p className="text-sm text-slate-400 max-w-md mx-auto">{description}</p>}
       </div>
       <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
         {actionLabel && onAction && (
           <button
             type="button"
             onClick={onAction}
-            className="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm rounded-lg transition shadow-xs"
+            className="px-5 py-2.5 glow-btn-primary font-bold text-sm rounded-xl transition shadow-lg"
           >
             {actionLabel}
           </button>
@@ -30,7 +32,7 @@ export default function EmptyState({
           <button
             type="button"
             onClick={onSecondaryAction}
-            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded-lg transition"
+            className="px-4 py-2.5 bg-white/10 hover:bg-white/15 text-slate-200 font-semibold text-sm rounded-xl transition border border-white/10"
           >
             {secondaryActionLabel}
           </button>
