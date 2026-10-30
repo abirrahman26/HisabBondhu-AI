@@ -1,0 +1,41 @@
+{
+  "name": "hisabbondhuai",
+  "version": "1.0.0",
+  "description": "A Bangla-speaking business assistant for Bangladeshi shopkeepers. *(Built from scratch at the Build with AI Hackathon with Google Antigravity. This repository currently contains the **documentation pack only**; application code is created at the venue.)*",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abirrahman26/HisabBondhu-AI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/abirrahman26/HisabBondhu-AI/issues"
+  },
+  "homepage": "https://github.com/abirrahman26/HisabBondhu-AI#readme",
+  "dependencies": {
+    "firebase": "^13.1.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.2",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.5",
+    "vitest": "^4.1.12"
+  }
+}

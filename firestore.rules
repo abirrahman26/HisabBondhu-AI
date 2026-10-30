@@ -1,0 +1,113 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default Deny All at root
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function isValidString(str, minLen, maxLen) {
+      return str is string && str.size() >= minLen && str.size() <= maxLen;
+    }
+
+    function isValidInt(val, minVal, maxVal) {
+      return val is int && val >= minVal && val <= maxVal;
+    }
+
+    function isValidNumber(val, minVal, maxVal) {
+      return (val is int || val is float) && val >= minVal && val <= maxVal;
+    }
+
+    // Per-shop isolation and entity validators
+    match /shops/{uid} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['shopName', 'ownerName', 'phone', 'createdAt', 'demoLoaded'])
+        && isValidString(request.resource.data.shopName, 1, 60)
+        && isValidString(request.resource.data.ownerName, 1, 60)
+        && isValidString(request.resource.data.phone, 11, 11);
+      allow delete: if false;
+
+      // Products subcollection
+      match /products/{productId} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasAll(['name', 'unit', 'buyPrice', 'sellPrice', 'stockQty', 'lowStockAt', 'active'])
+          && isValidString(request.resource.data.name, 1, 60)
+          && request.resource.data.unit in ['kg', 'piece', 'packet', 'litre']
+          && isValidInt(request.resource.data.buyPrice, 0, 10000000)
+          && isValidInt(request.resource.data.sellPrice, 0, 10000000)
+          && isValidNumber(request.resource.data.stockQty, -100000, 10000000)
+          && isValidNumber(request.resource.data.lowStockAt, 0, 10000000)
+          && request.resource.data.active is bool;
+        allow delete: if isOwner(uid) && resource.data.isDemo == true;
+      }
+
+      // Customers subcollection
+      match /customers/{customerId} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasAll(['name', 'phone', 'active'])
+          && isValidString(request.resource.data.name, 1, 60)
+          && isValidString(request.resource.data.phone, 11, 11)
+          && request.resource.data.active is bool;
+        allow delete: if isOwner(uid) && resource.data.isDemo == true;
+      }
+
+      // Sales subcollection (Append-only)
+      match /sales/{saleId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && request.resource.data.keys().hasAll(['dateKey', 'items', 'total', 'paymentType', 'createdBy'])
+          && isValidInt(request.resource.data.total, 0, 10000000)
+          && request.resource.data.items is list
+          && request.resource.data.items.size() > 0
+          && request.resource.data.paymentType in ['cash', 'mobile_banking', 'baki']
+          && (request.resource.data.paymentType != 'baki' || (request.resource.data.customerId is string && request.resource.data.customerId.size() > 0));
+        allow update: if false; // Append-only
+        allow delete: if isOwner(uid) && resource.data.isDemo == true;
+      }
+
+      // Ledger subcollection (Append-only for baki & repayment integrity)
+      match /ledger/{entryId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && request.resource.data.keys().hasAll(['customerId', 'type', 'amount', 'dateKey', 'createdBy'])
+          && request.resource.data.customerId is string
+          && request.resource.data.type in ['credit', 'payment']
+          && isValidInt(request.resource.data.amount, 1, 10000000);
+        allow update: if false; // Ledger entries cannot be edited directly
+        allow delete: if isOwner(uid) && resource.data.isDemo == true;
+      }
+
+      // Expenses subcollection
+      match /expenses/{expenseId} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasAll(['category', 'amount', 'dateKey', 'createdBy'])
+          && request.resource.data.category in ['rent', 'electricity', 'transport', 'salary', 'other']
+          && isValidInt(request.resource.data.amount, 1, 10000000);
+        allow delete: if isOwner(uid) && resource.data.isDemo == true;
+      }
+
+      // AI actions log (optional auditing)
+      match /aiActions/{actionId} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.status in ['proposed', 'confirmed', 'cancelled', 'failed'];
+        allow delete: if isOwner(uid) && resource.data.isDemo == true;
+      }
+    }
+  }
+}

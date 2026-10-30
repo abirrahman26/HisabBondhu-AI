@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+.vite/
+coverage/
+
+# Environment and secrets (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+serviceAccount*.json
+*-service-account*.json
+*firebase-adminsdk*.json
+credentials*.json
+.secrets/
+secrets/
+
+# Firebase local state
+.firebase/
+firebase-debug.log*
+firestore-debug.log
+ui-debug.log
+.runtimeconfig.json
+
+# Logs and OS/editor files
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local-only notes and test artifacts
+*.local
+screenshots/
+playwright-report/
+test-results/
