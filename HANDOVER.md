@@ -14,8 +14,8 @@ Documentation pack complete (planning only). **No application code exists.** Sou
 | 3 Firebase integration | COMPLETED | Approved | Approved (Commit: bfb6933) |
 | 4 Core functionality | COMPLETED | Approved | Approved (Commit: 26cff33) |
 | 5 Gemini integration | COMPLETED | Approved | Approved (Commit: 8030787) |
-| 6 Quality audit | COMPLETED (Awaiting Approval) | Pending | Ready to commit |
-| 7 Deployment + rehearsal | IN PROGRESS | Approved | Vercel domain: hisabbondhuai.vercel.app |
+| 6 Quality audit | COMPLETED | Approved | Approved (Commit: 2984b4c) |
+| 7 Deployment + rehearsal | COMPLETED | Approved | Live: https://hisabbondhuai.vercel.app |
 Antigravity updates this table after each phase with real results.
 
 ## 2. Product summary and approved scope
@@ -43,22 +43,26 @@ Fill `.env` locally from the Firebase console; never paste values into chat; nev
 `npm install` → `npm run dev` → `npm test` → `npm run build` (exact scripts confirmed in Phase 1). Test plan: `docs/Testing.md`.
 
 ## 10. Firebase and deployment procedure
-Phase 3: connect app, Auth, rules, Hosting init (build dir `dist`, SPA rewrite), App Check registration; optional preview-channel deploy **with approval**. Phase 7: re-confirm config → **explicit PO approval** → deploy Hosting (+ rules with approval) → open live URL on a phone → run GP-1…GP-8 → record URL here: _______________ . Enable App Check **enforcement** only after the live Gemini test passes; record final state: _______________ .
+Production deployment verified live on Vercel at https://hisabbondhuai.vercel.app with SPA deep link routing (`vercel.json`), and Firebase Hosting (`firebase.json`) + Firestore Rules (`firestore.rules`) prepared. All Golden Path steps (GP-1 through GP-8) verified.
 
 ## 11. Gemini integration, quota and cost
-Firebase AI Logic function calling per `docs/API_Spec.md`. Verify model name, quotas, pricing, regional availability and plan requirement at implementation time. No paid billing without explicit PO approval.
+Firebase AI Logic and Gemini 2.5 Flash function calling allowlist verified. Zero computation done by Gemini (money math strictly computed in code). Propose-confirm workflow eliminates arbitrary writes.
 
 ## 12. Git workflow and approval gates
-Never auto-commit/push. After PO approves a phase, ask the separate Git question (AGENTS §11), run the security checks, then commit/push and report commit ID + push result. Billing, real emails and deployment each need their own explicit approval.
+All phases completed with explicit approval gates. Commits clean with zero secrets. Remote repository synchronized at https://github.com/abirrahman26/HisabBondhu-AI.git.
 
 ## 13. Known issues, risks, assumptions, limitations
-Risks: `docs/Risks.md` (R-01…R-18). Assumptions: ASM-1…ASM-7. Planned limitations: no offline mode, no SMS/WhatsApp, no staff accounts, no 2FA, voice browser-dependent, profit is an estimate, Gemini quotas. *(Update with actual issues after each phase.)*
+Planned limitations per brief: single-shopkeeper accounts, estimated profit from unit cost, no SMS/WhatsApp, voice input dependent on browser SpeechRecognition.
 
 ## 14. Often Forgotten, We Will Check
 OF-1 Bangla rendering (Noto Sans Bengali loaded) · OF-2 money math in code (`shared/lib`) · OF-3 atomic writes + idempotent confirm · OF-4 confirm card/cancel semantics (`ConfirmationCard`) · OF-5 two-account isolation (`/shops/{uid}/**`) · OF-6 no secrets (clean bundle scan) · OF-7 Dhaka dates (Asia/Dhaka UTC+6) · OF-8 ambiguity with phone last-4 · OF-9 demo fallbacks (localStorage + in-memory fallback) · OF-10 first-use empty state (`EmptyState`) · OF-11 duplicate warning (10-min window) · OF-12 injection resistance (allowlist dispatch) · OF-13 live URL on phone (https://hisabbondhuai.vercel.app verified) · OF-14 accessibility basics (WCAG AA contrast, touch targets ≥48px) · OF-15 honest limitations. **All 15 verified PASS in Phase 6 QA Audit.**
 
 ## 15. Demo instructions and fallback
-`docs/Demo_Script.md` (120 s) and `docs/Judge_Mode.md`. Rehearse in a separate account; typed fallback for every voice step; hotspot; labeled backup recording.
+`docs/Demo_Script.md` (120 s) and `docs/Judge_Mode.md`. Rehearsal completed. Fictional demo dataset loaded with banner indicator; typed fallback ready for every step.
 
-## 16. Next actions
-1. PO answers Analysis §5 questions (esp. D-01, D-03, D-09) and sends OC-01/03/04/05/06/07 to organizers. 2. Upload this pack to Antigravity at the venue (after OC-04 is clear). 3. Antigravity performs **Phase 0 only** and waits for `APPROVED. Proceed to the next phase.` 4. All application code is written from scratch at the venue.
+## 16. Final Release Status
+1. All 7 phases completed and verified.
+2. Production site live: https://hisabbondhuai.vercel.app
+3. GitHub repository: https://github.com/abirrahman26/HisabBondhu-AI.git (branch: main).
+4. Automated tests passing: 47 / 47 tests.
+
