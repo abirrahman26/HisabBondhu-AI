@@ -61,6 +61,21 @@ export function getDhakaStartOfWeek(date = new Date()) {
   return `${sYear}-${sMonth}-${sDate}`;
 }
 
+export function getDhakaWeekRange(date = new Date()) {
+  const startDateKey = getDhakaStartOfWeek(date);
+  const parts = startDateKey.split('-');
+  const startDay = new Date(Date.UTC(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10) + 6));
+  const eYear = startDay.getUTCFullYear();
+  const eMonth = String(startDay.getUTCMonth() + 1).padStart(2, '0');
+  const eDate = String(startDay.getUTCDate()).padStart(2, '0');
+  const endDateKey = `${eYear}-${eMonth}-${eDate}`;
+
+  return {
+    startDateKey,
+    endDateKey,
+  };
+}
+
 export function isDateKeyInPeriod(dateKey, period = 'today', referenceDate = new Date()) {
   const todayKey = getDhakaDateKey(referenceDate);
   if (period === 'today') {

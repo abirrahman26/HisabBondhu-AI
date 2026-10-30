@@ -19,7 +19,6 @@ export function validateBakiArgs(args, allowedKeys = ['customerName', 'customerN
     return { valid: false, error: 'Arguments must be an object' };
   }
 
-  // Reject unexpected keys
   const keys = Object.keys(args);
   for (const k of keys) {
     if (!allowedKeys.includes(k)) {
@@ -27,7 +26,6 @@ export function validateBakiArgs(args, allowedKeys = ['customerName', 'customerN
     }
   }
 
-  // Validate amount
   const rawAmt = args.amount;
   if (typeof rawAmt !== 'number' || !Number.isInteger(rawAmt) || rawAmt <= 0) {
     return { valid: false, error: 'Amount must be a positive integer' };
@@ -36,7 +34,6 @@ export function validateBakiArgs(args, allowedKeys = ['customerName', 'customerN
     return { valid: false, error: 'Amount exceeds maximum allowed limit (৳10,000,000)' };
   }
 
-  // Must have either customerRef or customerName
   if (!args.customerRef && (!args.customerName || typeof args.customerName !== 'string' || !args.customerName.trim())) {
     return { valid: false, error: 'Customer identifier is required' };
   }
@@ -47,3 +44,75 @@ export function validateBakiArgs(args, allowedKeys = ['customerName', 'customerN
 
   return { valid: true };
 }
+
+export function validateEmail(email = '') {
+  if (typeof email !== 'string') return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+export function validatePassword(password = '') {
+  if (typeof password !== 'string') return false;
+  return password.length >= 6;
+}
+
+export function validatePhone(phone = '') {
+  const p = String(phone).trim();
+  // Accepts 01XXXXXXXXX or +8801XXXXXXXXX
+  return /^(?:\+8801|01)[3-9]\d{8}$/.test(p);
+}
+
+export function validateProductForm(data = {}) {
+  const { name, sellPrice, buyPrice, stock } = data;
+  if (!name || typeof name !== 'string' || !name.trim()) {
+    return { valid: false, error: 'পণ্যের নাম প্রয়োজন (Product name is required)' };
+  }
+  if (name.trim().length > 100) {
+    return { valid: false, error: 'পণ্যের নাম ১০০ অক্ষরের মধ্যে হতে হবে (Max 100 characters)' };
+  }
+  if (typeof sellPrice !== 'number' || sellPrice <= 0 || sellPrice > 1000000) {
+    return { valid: false, error: 'সঠিক বিক্রয় মূল্য দিন (Valid selling price required)' };
+  }
+  if (typeof buyPrice === 'number' && (buyPrice < 0 || buyPrice > 1000000)) {
+    return { valid: false, error: 'সঠিক ক্রয় মূল্য দিন (Valid buying price required)' };
+  }
+  if (typeof stock === 'number' && stock < 0) {
+    return { valid: false, error: 'স্টক সংখ্যা ঋণাত্মক হতে পারে না (Stock cannot be negative)' };
+  }
+  return { valid: true };
+}
+
+export function isOverpayment(paymentAmount, currentBalance) {
+  return typeof paymentAmount === 'number' && typeof currentBalance === 'number' && paymentAmount > currentBalance;
+}
+
+export function validatePaymentAmount(amount, balance) {
+  if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
+    return { valid: false, error: 'সঠিক টাকার পরিমাণ দিন (Amount must be greater than zero)' };
+  }
+  return { valid: true };
+}
+
+export function validateSaleItems(items = []) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return { valid: false, error: 'অন্তত একটি পণ্য নির্বাচন করুন (Select at least one product)' };
+  }
+  for (const item of items) {
+    if (!item.productId || typeof item.qty !== 'number' || item.qty <= 0) {
+      return { valid: false, error: 'সঠিক পরিমাণ ও পণ্য নির্বাচন করুন (Valid item & quantity required)' };
+    }
+  }
+  return { valid: true };
+}
+
+export function checkDuplicatePayment(recentLedger = [], customerId, amount, currentTime = Date.now()) {
+  if (!Array.isArray(recentLedger)) return false;
+  const tenMinutesMs = 10 * 60 * 1000;
+  return recentLedger.some((entry) => {
+    if (entry.customerId !== customerId || entry.amount !== amount || entry.type !== 'payment') {
+      return false;
+    }
+    const entryTime = new Date(entry.createdAt).getTime();
+    return Math.abs(currentTime - entryTime) <= tenMinutesMs;
+  });
+}
+

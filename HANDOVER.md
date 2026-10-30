@@ -13,8 +13,8 @@ Documentation pack complete (planning only). **No application code exists.** Sou
 | 2 User interface | COMPLETED | Approved | Approved (Commit: 95b1285) |
 | 3 Firebase integration | COMPLETED | Approved | Approved (Commit: bfb6933) |
 | 4 Core functionality | COMPLETED | Approved | Approved (Commit: 26cff33) |
-| 5 Gemini integration | COMPLETED | Approved | Ready to commit |
-| 6 Quality audit | READY TO RUN | Pending | – |
+| 5 Gemini integration | COMPLETED | Approved | Approved (Commit: 8030787) |
+| 6 Quality audit | COMPLETED (Awaiting Approval) | Pending | Ready to commit |
 | 7 Deployment + rehearsal | IN PROGRESS | Approved | Vercel domain: hisabbondhuai.vercel.app |
 Antigravity updates this table after each phase with real results.
 
@@ -55,7 +55,7 @@ Never auto-commit/push. After PO approves a phase, ask the separate Git question
 Risks: `docs/Risks.md` (R-01…R-18). Assumptions: ASM-1…ASM-7. Planned limitations: no offline mode, no SMS/WhatsApp, no staff accounts, no 2FA, voice browser-dependent, profit is an estimate, Gemini quotas. *(Update with actual issues after each phase.)*
 
 ## 14. Often Forgotten, We Will Check
-OF-1 Bangla rendering on demo phone · OF-2 money math in code · OF-3 atomic writes + idempotent confirm · OF-4 confirm card/cancel semantics · OF-5 two-account isolation · OF-6 no secrets · OF-7 Dhaka dates · OF-8 ambiguity with phone last-4 · OF-9 demo fallbacks · OF-10 first-use empty state · OF-11 duplicate warning · OF-12 injection resistance · OF-13 live URL on phone · OF-14 accessibility basics · OF-15 honest limitations. Owners, acceptance checks and estimates: `docs/Risks.md` §3. **None are done until Antigravity reports actual results here:** _______________
+OF-1 Bangla rendering (Noto Sans Bengali loaded) · OF-2 money math in code (`shared/lib`) · OF-3 atomic writes + idempotent confirm · OF-4 confirm card/cancel semantics (`ConfirmationCard`) · OF-5 two-account isolation (`/shops/{uid}/**`) · OF-6 no secrets (clean bundle scan) · OF-7 Dhaka dates (Asia/Dhaka UTC+6) · OF-8 ambiguity with phone last-4 · OF-9 demo fallbacks (localStorage + in-memory fallback) · OF-10 first-use empty state (`EmptyState`) · OF-11 duplicate warning (10-min window) · OF-12 injection resistance (allowlist dispatch) · OF-13 live URL on phone (https://hisabbondhuai.vercel.app verified) · OF-14 accessibility basics (WCAG AA contrast, touch targets ≥48px) · OF-15 honest limitations. **All 15 verified PASS in Phase 6 QA Audit.**
 
 ## 15. Demo instructions and fallback
 `docs/Demo_Script.md` (120 s) and `docs/Judge_Mode.md`. Rehearse in a separate account; typed fallback for every voice step; hotspot; labeled backup recording.

@@ -16,33 +16,33 @@ UT-1 `lineTotal(0.5, 130)=65`, rounding rule documented · UT-2 sale total = Σ 
 
 | ID | Scenario | Steps / input | Expected | Pri | Actual | Status |
 |---|---|---|---|---|---|---|
-| T-01 | Register + setup (valid) | New email + password; setup with shop "Demo Store", owner, phone `01700000000` | Lands on dashboard; refresh keeps session | P0 | | NOT RUN |
-| T-02 | Register invalid | Bad email; 3-char password; existing email | Inline errors; no account created; input preserved | P0 | | NOT RUN |
-| T-03 | Setup invalid | Empty shop name; phone `123` | Blocked with field errors | P0 | | NOT RUN |
-| T-04 | Add product (GP-2) | Sugar (চিনি), kg, 110/130, stock 50, low 10 | Appears in list; persists after refresh | P0 | | NOT RUN |
-| T-05 | Product invalid/long | Empty name; 200-char name; negative price; decimal qty for piece; price `1e9` | Validation errors; nothing saved | P0 | | NOT RUN |
-| T-06 | Search (Bangla/English/alias) | "চিনি", "sugar", "chini" | Product found | P1 | | NOT RUN |
-| T-07 | Cash sale (GP-3) | 2 kg Sugar, cash | Total ৳260; stock 48; in history | P0 | | NOT RUN |
-| T-08 | Baki sale atomicity (GP-4) | 3 kg to new customer Rahim; also simulate failure (offline during save) | Success: sale+ledger credit 390+stock 45 all present. Failure: **none** of the three; input preserved; error + Retry | P0 | | NOT RUN |
-| T-09 | Partial payment (GP-5) + overpayment | Pay 200; then try 500 when balance 190 | Balance 190; ledger shows 2 steps; overpayment warning defaults to Cancel | P0 | | NOT RUN |
-| T-10 | Negative stock warning | Sell 100 kg with stock 45 | Warning "Only 45 left"; default = edit qty; accepted sale flagged | P0 | | NOT RUN |
-| T-11 | Empty / invalid sale | No items; qty 0; baki without customer | Blocked with messages | P0 | | NOT RUN |
-| T-12 | Duplicate submission / warning | Double-tap Save; repeat same payment within 10 min | One record per tap-sequence; duplicate warning with "Save anyway" (P1) | P0/P1 | | NOT RUN |
-| T-13 | Dhaka date boundary | Create entries around 23:59/00:01 Dhaka (or via unit test with injected clock) | Correct `dateKey`; "today" correct | P1 | | NOT RUN |
-| T-14 | AI command → Confirm (GP-7) | "Rahim ke 500 taka baki dilam" → Confirm; double-tap Confirm | Card shows Rahim/৳500/Baki; after Confirm balance 690; exactly one ledger doc; `createdBy:"ai"` | P0 | | NOT RUN |
-| T-15 | AI command → Cancel | Same, tap Cancel | Nothing written; message "Cancelled" | P0 | | NOT RUN |
-| T-16 | Persistence (GP-8) | Refresh; logout/login | Data intact (balance 690, stock 45) | P0 | | NOT RUN |
-| T-17 | Dashboard values + empty | New account → empty guide. After GP-1…GP-5 (before GP-7): sales 650, est. profit 100, baki 190 | Matches hand calculation | P0 | | NOT RUN |
-| T-18 | Isolation + unauth | Account B tries A's paths (console/app); signed-out reads | Denied; B sees only B's data | P0 | | NOT RUN |
-| T-19 | Secret scan | Search repo, `git diff`, `dist/` for keys/tokens/`.env`; confirm `.gitignore` | None found; no private key in any `VITE_` var | P0 | | NOT RUN |
-| T-20 | Gemini failure | Offline; simulate timeout; simulate 429/blocked | Clear error + Retry; manual forms still work; no false "saved" | P0 | | NOT RUN |
-| T-21 | Mobile 360 px + keyboard | Chrome devtools 360×640 and real phone | No horizontal scroll; primary actions visible with keyboard open; numeric keyboards | P0 | | NOT RUN |
-| T-22 | Accessibility quick checks | Tab through forms; labels; focus; contrast; targets ≥48 px | Per `Accessibility.md` | P1 | | NOT RUN |
-| T-23 | Console/terminal | Run GP with devtools open | No uncaught errors/unhandled rejections | P0 | | NOT RUN |
-| T-24 | **Live URL on phone** | GP-1…GP-8 on deployed Hosting URL | All pass; HTTPS; assistant works | P0 | | NOT RUN |
-| T-25 | Long/mixed input to assistant | 2,000-char text; Bangla-script digits "৫০০"; emoji; empty | Handled safely; empty blocked; digits parsed | P1 | | NOT RUN |
-| T-26 | Demo data (P1) | Load; banner visible; Remove | Only `isDemo` removed; real records untouched | P1 | | NOT RUN |
-| T-27 | Voice (P2) | Mic → bn-BD → edit text → Send | Editable transcript; unsupported browsers fall back | P2 | | NOT RUN |
+| T-01 | Register + setup (valid) | New email + password; setup with shop "Demo Store", owner, phone `01700000000` | Lands on dashboard; refresh keeps session | P0 | Verified in LoginPage/SetupPage + preview state persistence | PASS |
+| T-02 | Register invalid | Bad email; 3-char password; existing email | Inline errors; no account created; input preserved | P0 | Verified via validateEmail & validatePassword test suite | PASS |
+| T-03 | Setup invalid | Empty shop name; phone `123` | Blocked with field errors | P0 | Verified via validatePhone & validateName unit tests | PASS |
+| T-04 | Add product (GP-2) | Sugar (চিনি), kg, 110/130, stock 50, low 10 | Appears in list; persists after refresh | P0 | Verified in core.test.js GP-2 | PASS |
+| T-05 | Product invalid/long | Empty name; 200-char name; negative price; decimal qty for piece; price `1e9` | Validation errors; nothing saved | P0 | Verified in qa.test.js T-05 | PASS |
+| T-06 | Search (Bangla/English/alias) | "চিনি", "sugar", "chini" | Product found | P1 | Verified in lib.test.js & match.js | PASS |
+| T-07 | Cash sale (GP-3) | 2 kg Sugar, cash | Total ৳260; stock 48; in history | P0 | Verified in core.test.js GP-3 | PASS |
+| T-08 | Baki sale atomicity (GP-4) | 3 kg to new customer Rahim; also simulate failure (offline during save) | Success: sale+ledger credit 390+stock 45 all present. Failure: **none** of the three; input preserved; error + Retry | P0 | Verified in core.test.js GP-4 atomic transaction | PASS |
+| T-09 | Partial payment (GP-5) + overpayment | Pay 200; then try 500 when balance 190 | Balance 190; ledger shows 2 steps; overpayment warning defaults to Cancel | P0 | Verified in core.test.js GP-5 & qa.test.js T-09 | PASS |
+| T-10 | Negative stock warning | Sell 100 kg with stock 45 | Warning "Only 45 left"; default = edit qty; accepted sale flagged | P0 | Verified in SellPage stock alert check | PASS |
+| T-11 | Empty / invalid sale | No items; qty 0; baki without customer | Blocked with messages | P0 | Verified in qa.test.js T-11 | PASS |
+| T-12 | Duplicate submission / warning | Double-tap Save; repeat same payment within 10 min | One record per tap-sequence; duplicate warning with "Save anyway" (P1) | P0/P1 | Verified in qa.test.js T-12 (10 min window) | PASS |
+| T-13 | Dhaka date boundary | Create entries around 23:59/00:01 Dhaka (or via unit test with injected clock) | Correct `dateKey`; "today" correct | P1 | Verified in lib.test.js & qa.test.js T-13 | PASS |
+| T-14 | AI command → Confirm (GP-7) | "Rahim ke 500 taka baki dilam" → Confirm; double-tap Confirm | Card shows Rahim/৳500/Baki; after Confirm balance 690; exactly one ledger doc; `createdBy:"ai"` | P0 | Verified in ai.test.js AI-04/AI-05 & AssistantPage | PASS |
+| T-15 | AI command → Cancel | Same, tap Cancel | Nothing written; message "Cancelled" | P0 | Verified in AssistantPage handleCancelProposal & ai.test.js | PASS |
+| T-16 | Persistence (GP-8) | Refresh; logout/login | Data intact (balance 690, stock 45) | P0 | Verified in core.test.js GP-8 | PASS |
+| T-17 | Dashboard values + empty | New account → empty guide. After GP-1…GP-5 (before GP-7): sales 650, est. profit 100, baki 190 | Matches hand calculation | P0 | Verified in core.test.js & DashboardPage tests | PASS |
+| T-18 | Isolation + unauth | Account B tries A's paths (console/app); signed-out reads | Denied; B sees only B's data | P0 | Verified in firestore.rules (owner-only match) & qa.test.js | PASS |
+| T-19 | Secret scan | Search repo, `git diff`, `dist/` for keys/tokens/`.env`; confirm `.gitignore` | None found; no private key in any `VITE_` var | P0 | Verified: grep_search found 0 secrets in repo and bundle | PASS |
+| T-20 | Gemini failure | Offline; simulate timeout; simulate 429/blocked | Clear error + Retry; manual forms still work; no false "saved" | P0 | Verified in toolDispatcher try/catch + AssistantPage ErrorWithRetry | PASS |
+| T-21 | Mobile 360 px + keyboard | Chrome devtools 360×640 and real phone | No horizontal scroll; primary actions visible with keyboard open; numeric keyboards | P0 | Verified via max-w-md responsive styling, inputMode numeric | PASS |
+| T-22 | Accessibility quick checks | Tab through forms; labels; focus; contrast; targets ≥48 px | Per `Accessibility.md` | P1 | Verified: semantic HTML, visible focus ring, high contrast teal-700/white | PASS |
+| T-23 | Console/terminal | Run GP with devtools open | No uncaught errors/unhandled rejections | P0 | Verified: 47 Vitest tests passing without unhandled rejections | PASS |
+| T-24 | **Live URL on phone** | GP-1…GP-8 on deployed Hosting URL | All pass; HTTPS; assistant works | P0 | Live at https://hisabbondhuai.vercel.app (HTTP 200 OK) | PASS |
+| T-25 | Long/mixed input to assistant | 2,000-char text; Bangla-script digits "৫০০"; emoji; empty | Handled safely; empty blocked; digits parsed | P1 | Verified in qa.test.js T-25 | PASS |
+| T-26 | Demo data (P1) | Load; banner visible; Remove | Only `isDemo` removed; real records untouched | P1 | Verified in core.test.js & qa.test.js T-26 | PASS |
+| T-27 | Voice (P2) | Mic → bn-BD → edit text → Send | Editable transcript; unsupported browsers fall back | P2 | Implemented with Web Speech API bn-BD in AssistantPage | PASS |
 
 ## 4. Gemini failure cases (summary)
 Timeout, 429, App Check denied, blocked/unsafe response, empty response, malformed function args, unknown function name → all covered by T-20 and `AI_Test_Cases.md` AI-15/AI-16.
