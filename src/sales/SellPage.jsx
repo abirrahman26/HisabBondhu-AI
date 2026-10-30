@@ -178,7 +178,7 @@ export default function SellPage() {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/dashboard')}
               className="px-4 py-2.5 border border-white/15 hover:bg-white/10 text-slate-300 font-semibold rounded-xl transition"
             >
               Go to Dashboard

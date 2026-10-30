@@ -43,7 +43,7 @@ export default function SetupPage() {
         ownerName: ownerName.trim(),
         phone: phone.trim(),
       });
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       setServerError(err.message || 'Failed to save shop profile. Please try again.');
     } finally {

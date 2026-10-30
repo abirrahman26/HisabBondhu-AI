@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
 import { DataProvider } from './shared/data/DataContext';
 import ProtectedRoute from './auth/ProtectedRoute';
 import AppShell from './shared/ui/AppShell';
+import HomePage from './home/HomePage';
 import DashboardPage from './dashboard/DashboardPage';
 import LoginPage from './auth/LoginPage';
 import SetupPage from './auth/SetupPage';
@@ -23,6 +24,9 @@ export default function App() {
       <DataProvider>
         <BrowserRouter>
           <Routes>
+            {/* Public Homepage showcasing Website Title, Themes, Features, Live AI Sandbox & CTAs */}
+            <Route path="/" element={<HomePage />} />
+
             <Route path="/login" element={<LoginPage />} />
             <Route
               path="/setup"
@@ -32,23 +36,25 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* Authenticated Application Shell */}
             <Route
-              path="/"
               element={
                 <ProtectedRoute>
                   <AppShell />
                 </ProtectedRoute>
               }
             >
-              <Route index element={<DashboardPage />} />
-              <Route path="sell" element={<SellPage />} />
-              <Route path="history" element={<HistoryPage />} />
-              <Route path="customers" element={<CustomersPage />} />
-              <Route path="customers/:id" element={<CustomerLedgerPage />} />
-              <Route path="products" element={<ProductsPage />} />
-              <Route path="assistant" element={<AssistantPage />} />
-              <Route path="expenses" element={<ExpensesPage />} />
-              <Route path="settings" element={<SettingsPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/app" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/sell" element={<SellPage />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="/customers" element={<CustomersPage />} />
+              <Route path="/customers/:id" element={<CustomerLedgerPage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/assistant" element={<AssistantPage />} />
+              <Route path="/expenses" element={<ExpensesPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>

@@ -21,8 +21,8 @@ export default function LoginPage() {
       if (!shopProfile) {
         navigate('/setup');
       } else {
-        const from = location.state?.from?.pathname || '/';
-        navigate(from, { replace: true });
+        const from = location.state?.from?.pathname || '/dashboard';
+        navigate(from === '/' ? '/dashboard' : from, { replace: true });
       }
     }
   }, [currentUser, shopProfile, navigate, location]);
@@ -57,7 +57,8 @@ export default function LoginPage() {
         navigate('/setup');
       } else {
         await login(email, password);
-        navigate('/');
+        const from = location.state?.from?.pathname || '/dashboard';
+        navigate(from === '/' ? '/dashboard' : from);
       }
     } catch (err) {
       setServerError(err.message || 'Authentication failed. Please check your credentials.');
@@ -71,7 +72,7 @@ export default function LoginPage() {
     setServerError('');
     try {
       await login('demo@hisabbondhu.ai', '123456');
-      navigate('/');
+      navigate('/dashboard');
     } catch {
       // If demo user doesn't exist yet in real auth, try registering it
       try {

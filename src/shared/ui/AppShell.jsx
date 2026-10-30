@@ -19,7 +19,7 @@ export default function AppShell() {
   }, []);
 
   const navItems = [
-    { to: '/', label: 'Home', icon: '🏠' },
+    { to: '/dashboard', label: 'Dashboard', icon: '📊' },
     { to: '/sell', label: 'Sell', icon: '⚡' },
     { to: '/customers', label: 'Baki', icon: '📖' },
     { to: '/products', label: 'Products', icon: '📦' },
@@ -42,7 +42,7 @@ export default function AppShell() {
       {/* Top Header */}
       <header className="bg-slate-950/75 backdrop-blur-xl border-b border-white/10 sticky top-0 z-30 shadow-lg">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <NavLink to="/" className="flex items-center gap-2 font-extrabold text-lg sm:text-xl tracking-tight group">
+          <NavLink to="/dashboard" className="flex items-center gap-2 font-extrabold text-lg sm:text-xl tracking-tight group">
             <span className="p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 group-hover:border-sky-400/50 transition">
               ✨
             </span>
@@ -55,6 +55,14 @@ export default function AppShell() {
           </NavLink>
           {/* Desktop Navigation Links (Visible on tablet & desktop >= 768px) */}
           <nav aria-label="Desktop Navigation" className="hidden md:flex items-center gap-1.5">
+            <NavLink
+              to="/"
+              className="text-xs font-semibold px-2.5 py-2 rounded-xl transition text-slate-400 hover:text-sky-300 hover:bg-white/5"
+              title="Return to Website Home"
+            >
+              🌐 Home
+            </NavLink>
+            <div className="h-4 w-px bg-white/10 mx-1" />
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
