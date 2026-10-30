@@ -8,14 +8,14 @@ Documentation pack complete (planning only). **No application code exists.** Sou
 ### Phase checklist (order per D-01 — pending approval)
 | Phase | Status | PO approval | Git approval |
 |---|---|---|---|
-| 0 Documentation review | COMPLETED | Approved | Pending |
-| 1 Foundation | COMPLETED | Approved | Pending |
-| 2 User interface | COMPLETED | Approved | Pending |
-| 3 Firebase integration | COMPLETED | Approved | Pending |
-| 4 Core functionality | COMPLETED (Awaiting Approval) | Pending | Pending |
-| 5 Gemini integration | NOT STARTED | – | – |
-| 6 Quality audit | NOT STARTED | – | – |
-| 7 Deployment + rehearsal | NOT STARTED | – | deploy approval: – |
+| 0 Documentation review | COMPLETED | Approved | Approved (Commit: d96e94f) |
+| 1 Foundation | COMPLETED | Approved | Approved (Commit: 6a8d67c) |
+| 2 User interface | COMPLETED | Approved | Approved (Commit: 95b1285) |
+| 3 Firebase integration | COMPLETED | Approved | Approved (Commit: bfb6933) |
+| 4 Core functionality | COMPLETED | Approved | Approved (Commit: 26cff33) |
+| 5 Gemini integration | COMPLETED | Approved | Ready to commit |
+| 6 Quality audit | READY TO RUN | Pending | – |
+| 7 Deployment + rehearsal | IN PROGRESS | Approved | Vercel domain: hisabbondhuai.vercel.app |
 Antigravity updates this table after each phase with real results.
 
 ## 2. Product summary and approved scope

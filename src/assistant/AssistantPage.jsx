@@ -1,14 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useData } from '../shared/data/DataContext';
 import ConfirmationCard from '../shared/ui/ConfirmationCard';
 import VerifiedDataCard from '../shared/ui/VerifiedDataCard';
-import { getDhakaDateKey } from '../shared/lib/dates';
+import { processAssistantQuery } from './toolDispatcher';
+import { formatMoney } from '../shared/lib/money';
 
 export default function AssistantPage() {
+  const { products, customers, sales, ledger, expenses, recordBaki, recordPayment } = useData();
+
   const [messages, setMessages] = useState([
     {
       id: 'm1',
       sender: 'ai',
-      text: 'আসসালামু আলাইকুম! আমি আপনার হিসাববন্ধু। আপনার দোকানের বিক্রি, বাকি বা স্টক সম্পর্কে বাংলায় প্রশ্ন করুন অথবা নির্দেশ দিন।',
+      text: 'আসসালামু আলাইকুম! আমি আপনার ডিজিটাল হিসাববন্ধু। আপনার দোকানের বিক্রি, বাকি বা স্টক সম্পর্কে বাংলায় প্রশ্ন করুন অথবা নির্দেশ দিন।',
       timestamp: '10:00 AM',
     },
   ]);
@@ -32,7 +36,7 @@ export default function AssistantPage() {
     scrollToBottom();
   }, [messages, isThinking]);
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     const query = input.trim();
     if (!query) return;
@@ -48,74 +52,73 @@ export default function AssistantPage() {
     setInput('');
     setIsThinking(true);
 
-    // Phase 2 UI interaction simulation (will wire to Gemini tool dispatcher in Phase 5)
-    setTimeout(() => {
-      setIsThinking(false);
+    try {
+      const response = await processAssistantQuery(query, {
+        products,
+        customers,
+        sales,
+        ledger,
+        expenses,
+      });
 
-      if (query.toLowerCase().includes('baki ache') || query.includes('সব থেকে বেশি বাকি')) {
-        // GP-6 Read Simulation
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `ai_${Date.now()}`,
-            sender: 'ai',
-            text: 'আপনার মোট বকেয়া বাকি ২,২৪০ টাকা। সবচেয়ে বেশি বাকি করিম মিয়ার কাছে ১,২০০ টাকা, এরপর নাসিমা বেগম ৮৫০ টাকা এবং রহিম ১৯০ টাকা।',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            verifiedData: {
-              title: 'Top Debtors (শীর্ষ বাকিদার)',
-              items: [
-                { name: 'Karim Mia', balance: 1200 },
-                { name: 'Nasima Begum', balance: 850 },
-                { name: 'Rahim', balance: 190 },
-              ],
-              total: 2240,
-            },
-          },
-        ]);
-      } else if (query.toLowerCase().includes('baki dilam') || query.includes('বাকি দিলাম')) {
-        // GP-7 Propose Simulation
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `ai_${Date.now()}`,
-            sender: 'ai',
-            text: 'রহিমকে ৫০০ টাকা বাকি দেওয়ার জন্য তথ্য প্রস্তুত করা হয়েছে। আপনি কি এই এন্ট্রিটি নিশ্চিত করতে চান?',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            proposal: {
-              id: `prop_${Date.now()}`,
-              type: 'baki',
-              customerName: 'Rahim',
-              amount: 500,
-              dateKey: getDhakaDateKey(),
-              originalText: query,
-            },
-          },
-        ]);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `ai_${Date.now()}`,
-            sender: 'ai',
-            text: 'আমি আপনার অনুরোধটি বুঝতে পেরেছি। সম্পূর্ণ জেমিনি মডেল সংযোগ ফেজ ৫ এ সক্রিয় হবে।',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          },
-        ]);
-      }
-    }, 600);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `ai_${Date.now()}`,
+          sender: 'ai',
+          text: response.text,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          verifiedData: response.verifiedData,
+          proposal: response.proposal,
+        },
+      ]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `ai_err_${Date.now()}`,
+          sender: 'ai',
+          text: 'দুঃখিত, অনুরোধটি প্রক্রিয়াকরণে সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } finally {
+      setIsThinking(false);
+    }
   };
 
   const handleConfirmProposal = async (proposal) => {
-    // Propose-Confirm pattern
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: `sys_${Date.now()}`,
-        sender: 'ai',
-        text: `সফলভাবে সংরক্ষিত হয়েছে! রহিমের নতুন বাকি ব্যালেন্স ৬৯০ টাকা।`,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      },
-    ]);
+    try {
+      if (proposal.type === 'baki') {
+        await recordBaki({
+          customerId: proposal.customerId,
+          amount: proposal.amount,
+          note: proposal.originalText,
+          proposalId: proposal.id,
+          createdBy: 'ai',
+        });
+      } else if (proposal.type === 'payment') {
+        await recordPayment({
+          customerId: proposal.customerId,
+          amount: proposal.amount,
+          note: proposal.originalText,
+          proposalId: proposal.id,
+          createdBy: 'ai',
+        });
+      }
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `sys_${Date.now()}`,
+          sender: 'ai',
+          text: `সফলভাবে সংরক্ষিত হয়েছে! ${proposal.customerName}-এর হিসাবে ${formatMoney(proposal.amount)} যোগ করা হয়েছে।`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } catch (err) {
+      alert('Failed to save confirmed action: ' + err.message);
+    }
   };
 
   const handleCancelProposal = (proposal) => {
@@ -124,7 +127,7 @@ export default function AssistantPage() {
       {
         id: `sys_${Date.now()}`,
         sender: 'ai',
-        text: 'বাতিল করা হয়েছে। কোনো তথ্য সংরক্ষণ করা হয়নি।',
+        text: 'বাতিল করা হয়েছে। কোনো তথ্য সংরক্ষণ করা হয়নি। (Cancelled — Nothing saved)',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
     ]);
@@ -141,7 +144,9 @@ export default function AssistantPage() {
               Gemini Powered
             </span>
           </h1>
-          <p className="text-xs text-slate-500">Bangla business conversation and propose-confirm actions</p>
+          <p className="text-xs text-slate-500">
+            Bangla business conversation, allowlisted tools & propose-confirm safety
+          </p>
         </div>
       </div>
 
@@ -203,7 +208,7 @@ export default function AssistantPage() {
         {isThinking && (
           <div className="flex items-center gap-2 text-xs text-slate-400 italic py-2">
             <span className="animate-spin">⚙️</span>
-            <span>হিসাববন্ধু ভাবছে… (Thinking)</span>
+            <span>হিসাববন্ধু তথ্য যাচাই করছে… (Thinking)</span>
           </div>
         )}
         <div ref={messagesEndRef} />

@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/abirrahman26/HisabBondhu-AI#readme",
   "dependencies": {
+    "@google/genai": "^2.32.0",
     "firebase": "^13.1.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
