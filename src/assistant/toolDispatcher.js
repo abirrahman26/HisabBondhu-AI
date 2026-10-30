@@ -1,6 +1,7 @@
 import { getDhakaDateKey } from '../shared/lib/dates';
 import { parseBengaliDigits, matchName, resolveEntity } from '../shared/lib/match';
 import { validateBakiArgs } from '../shared/lib/validate';
+import { calcPeriodProfit } from '../shared/lib/profit';
 
 /**
  * Tool Declarations for Gemini Function Calling (API_Spec.md §3).
@@ -42,6 +43,16 @@ export const geminiToolDeclarations = [
         productName: { type: 'STRING', description: 'Name or alias of the product (e.g. Sugar or chini).' },
       },
       required: ['productName'],
+    },
+  },
+  {
+    name: 'getPeriodSummary',
+    description: 'Get today\'s total sales, costs, expenses, and estimated net profit.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        period: { type: 'STRING', description: 'today, week, or month.' },
+      },
     },
   },
   {
@@ -177,6 +188,17 @@ export async function executeTool(toolName, args = {}, shopData, userQuery = '')
       };
     }
 
+    case 'getPeriodSummary': {
+      const todaySales = sales.filter((s) => s.dateKey === todayKey);
+      const todayExpenses = (shopData.expenses || []).filter((e) => e.dateKey === todayKey);
+      const profitData = calcPeriodProfit(todaySales, todayExpenses);
+      return {
+        date: todayKey,
+        saleCount: todaySales.length,
+        ...profitData,
+      };
+    }
+
     case 'proposeBakiEntry': {
       // Validate schema and bounds
       const validation = validateBakiArgs(args);
@@ -290,14 +312,167 @@ export async function executeTool(toolName, args = {}, shopData, userQuery = '')
 }
 
 /**
- * Smart Dispatcher: Interprets user query, calls tool, and formats response in Bangla or English.
- * Supports direct Gemini API or fallback rule dispatcher.
+ * Direct Gemini 2.5 Flash API Caller.
+ * Active when VITE_GEMINI_API_KEY is configured in client environment.
  */
-export async function processAssistantQuery(queryText, shopData) {
+export async function callGeminiApi(queryText, history = [], shopData = {}) {
+  const apiKey = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) || '';
+  if (!apiKey) return null;
+
+  try {
+    const formattedTools = [
+      {
+        functionDeclarations: geminiToolDeclarations.map((t) => ({
+          name: t.name,
+          description: t.description,
+          parameters: t.parameters,
+        })),
+      },
+    ];
+
+    const contents = [
+      ...history.map((h) => ({
+        role: h.sender === 'user' ? 'user' : 'model',
+        parts: [{ text: h.text }],
+      })),
+      { role: 'user', parts: [{ text: queryText }] },
+    ];
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }],
+          },
+          contents,
+          tools: formattedTools,
+        }),
+      }
+    );
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const candidate = data.candidates?.[0];
+    const parts = candidate?.content?.parts || [];
+
+    // Check for tool call
+    const functionCallPart = parts.find((p) => p.functionCall);
+    if (functionCallPart) {
+      const { name, args } = functionCallPart.functionCall;
+      const toolRes = await executeTool(name, args || {}, shopData, queryText);
+
+      if (name === 'proposeBakiEntry' || name === 'proposePayment') {
+        if (toolRes.status === 'ready') {
+          return {
+            text: `${toolRes.proposal.customerName}-এর জন্য ৳${toolRes.proposal.amount.toLocaleString('en-BD')} ${
+              toolRes.proposal.type === 'baki' ? 'বাকি দেওয়ার' : 'পরিশোধ গ্রহণ করার'
+            } একটি প্রস্তাবনা তৈরি করা হয়েছে। অনুগ্রহ করে কার্ড দেখে নিশ্চিত করুন।`,
+            proposal: toolRes.proposal,
+          };
+        } else if (toolRes.status === 'ambiguous') {
+          const namesList = toolRes.candidates.map((c) => `${c.name} (…${c.phoneLast4})`).join(' নাকি ');
+          return {
+            text: `খাতায় এই নামে একাধিক গ্রাহক রয়েছেন: ${namesList}? কার হিসাব লিখতে চান?`,
+          };
+        } else if (toolRes.status === 'not_found') {
+          return {
+            text: `গ্রাহক "${toolRes.customerName}" আপনার খাতায় পাওয়া যায়নি।`,
+          };
+        } else {
+          return {
+            text: `লেনদেন প্রস্তাব করা যায়নি: ${toolRes.reason || 'ভুল তথ্য'}`,
+          };
+        }
+      }
+
+      // Format verified data for read tools
+      let verifiedData = undefined;
+      if (name === 'getCustomerBalances') {
+        verifiedData = {
+          title: 'Customer Baki Balances (বাকিদারদের তালিকা)',
+          items: toolRes.items.map((c) => ({
+            name: c.name,
+            balance: c.balance,
+            phoneLast4: c.phoneLast4,
+          })),
+          total: toolRes.totalOutstanding,
+        };
+      } else if (name === 'getTodaySales') {
+        verifiedData = {
+          title: 'আজকের বিক্রির হিসাব',
+          items: [
+            { label: 'নগদ বিক্রি', amount: toolRes.cashTotal },
+            { label: 'মোবাইল ব্যাংকিং', amount: toolRes.mobileBankingTotal },
+            { label: 'বাকি বিক্রি', amount: toolRes.bakiTotal },
+          ],
+          total: toolRes.totalSales,
+        };
+      } else if (name === 'getLowStock') {
+        verifiedData = {
+          title: 'Low Stock Alerts (মজুদ সতর্কতা)',
+          items: toolRes.items.map((i) => ({
+            name: i.productName,
+            stockQty: i.stockQty,
+            unit: i.unit,
+          })),
+        };
+      } else if (name === 'getProductInfo') {
+        verifiedData = {
+          title: 'পণ্য তথ্য (Product Details)',
+          items: toolRes.matches.map((p) => ({
+            name: p.name,
+            sellPrice: `৳${p.sellPrice}`,
+            stockQty: `${p.stockQty} ${p.unit}`,
+          })),
+        };
+      } else if (name === 'getPeriodSummary') {
+        verifiedData = {
+          title: 'আজকের লাভ-ক্ষতির হিসাব',
+          items: [
+            { label: 'মোট বিক্রি', amount: toolRes.totalSales },
+            { label: 'পণ্যের ক্রয়মূল্য (COGS)', amount: toolRes.totalCost },
+            { label: 'দোকান খরচ (Expenses)', amount: toolRes.totalExpenses },
+          ],
+          total: toolRes.estimatedProfit,
+        };
+      }
+
+      return {
+        text: 'আপনার অনুরোধ অনুযায়ী হিসাবের তথ্য তুলে ধরা হলো:',
+        verifiedData,
+      };
+    }
+
+    const textPart = parts.find((p) => p.text);
+    if (textPart && textPart.text) {
+      return { text: textPart.text };
+    }
+  } catch (err) {
+    console.warn('Gemini API call failed, falling back to local engine:', err);
+  }
+  return null;
+}
+
+/**
+ * Smart Dispatcher: Interprets user query, calls tool, and formats response in Bangla or English.
+ * Supports direct Gemini API or fallback multi-intent rule dispatcher.
+ */
+export async function processAssistantQuery(queryText, shopData = {}, history = []) {
+  // Try live Gemini API if configured
+  const apiResult = await callGeminiApi(queryText, history, shopData);
+  if (apiResult) {
+    return apiResult;
+  }
+
   const norm = parseBengaliDigits(queryText.trim().toLowerCase());
+  const { products = [], customers = [], sales = [], expenses = [] } = shopData;
 
   // 1. Check for AI-14: poem / out of scope
-  if (norm.includes('kobita') || norm.includes('কবিতা') || norm.includes('গান')) {
+  if (norm.includes('kobita') || norm.includes('কবিতা') || norm.includes('গান') || norm.includes('story') || norm.includes('গল্প')) {
     return {
       text: 'দুঃখিত, আমি কেবল আপনার দোকানের হিসাব, বিক্রি, বাকি ও স্টক সংক্রান্ত ব্যবসায়িক কাজে সাহায্য করতে পারি। আপনি কি আজকের বিক্রি বা বাকি সম্পর্কে জানতে চান?',
     };
@@ -310,128 +485,89 @@ export async function processAssistantQuery(queryText, shopData) {
     };
   }
 
-  // 3. Check for AI-10 / AI-11: Ambiguous amounts or missing amounts
+  // 3. Greetings & Bot Identity
+  if (
+    /^(hi|hello|hey)\b/i.test(norm) ||
+    norm.includes('assalamu') ||
+    norm.includes('সালাম') ||
+    norm.includes('kemon') ||
+    norm.includes('কেমন আছেন') ||
+    norm.includes('কেমন আছো') ||
+    norm.includes('tumi ke') ||
+    norm.includes('তুমি কে') ||
+    norm.includes('who are you') ||
+    norm.includes('porichoy') ||
+    norm.includes('পরিচয়')
+  ) {
+    return {
+      text: 'ওয়ালাইকুম আসসালাম! আমি হিসাববন্ধু — আপনার বিশ্বস্ত ডিজিটাল খাতা সহকারী। আমি আপনাকে আজকের বিক্রি, বাকিদারদের তালিকা, পণ্যের দাম ও স্টক জানাতে পারি এবং মুখে বললে বাকি বা জমা এন্ট্রি প্রস্তুত করে দিতে পারি। আমি আপনাকে কীভাবে সাহায্য করতে পারি?',
+    };
+  }
+
+  // 4. Business Advice & Shop Improvement Tips
+  if (
+    norm.includes('advice') ||
+    norm.includes('tips') ||
+    norm.includes('পরামর্শ') ||
+    norm.includes('বিক্রি বাড়াব') ||
+    norm.includes('বিক্রি বাড়ানো') ||
+    norm.includes('লাভ বাড়ানোর') ||
+    norm.includes('উন্নতি') ||
+    norm.includes('কৌশল') ||
+    norm.includes('দোকান পরিচালনা') ||
+    norm.includes('how to improve')
+  ) {
+    return {
+      text: `দোকানের বিক্রি ও মুনাফা বৃদ্ধির কিছু ব্যবহারিক পরামর্শ:
+১. দ্রুত চলমান নিত্যপ্রয়োজনীয় পণ্যের (চাল, ডাল, চিনি, তেল) স্টক কখনোই শূন্য হতে দেবেন না।
+২. নিয়মিত বাকি খাতা পর্যালোচনা করুন এবং ৩ দিনের বেশি বাকি থাকা গ্রাহকদের বিনীতভাবে স্মরণ করিয়ে দিন।
+৩. কম বিক্রিত বা মেয়াদ শেষের কাছাকাছি পণ্য চিহ্নিত করে কিছুটা কম লাভে বিক্রি করুন।
+৪. প্রতিদিনের দোকান খরচ আলাদাভাবে লিপিবদ্ধ করে আসল নীট মুনাফা পর্যবেক্ষণ করুন।`,
+    };
+  }
+
+  // 5. Today's Profit & Financial Summary (calcPeriodProfit)
+  if (
+    norm.includes('labh') ||
+    norm.includes('লাভ') ||
+    norm.includes('profit') ||
+    norm.includes('khoroch') ||
+    norm.includes('খরচ') ||
+    norm.includes('lav') ||
+    norm.includes('loss') ||
+    norm.includes('লোকসান')
+  ) {
+    const res = await executeTool('getPeriodSummary', {}, shopData, queryText);
+    const estProfit = res.estimatedProfit || 0;
+    const estProfitStr = Math.abs(estProfit).toLocaleString('en-BD');
+    const profitStatus = estProfit >= 0 ? `আনুমানিক লাভ ৳${estProfitStr}` : `আনুমানিক ক্ষতি ৳${estProfitStr}`;
+
+    return {
+      text: `আজকের হিসাব অনুযায়ী মোট বিক্রি ৳${res.totalSales.toLocaleString('en-BD')}, পণ্যের ক্রয়মূল্য ৳${res.totalCost.toLocaleString('en-BD')}, এবং দোকানের খরচ ৳${res.totalExpenses.toLocaleString('en-BD')}। আপনার আজকের ${profitStatus}।`,
+      verifiedData: {
+        title: 'আজকের লাভ-ক্ষতির হিসাব',
+        items: [
+          { label: 'মোট বিক্রি (Sales)', amount: res.totalSales },
+          { label: 'পণ্যের ক্রয়মূল্য (COGS)', amount: res.totalCost },
+          { label: 'দোকান খরচ (Expenses)', amount: res.totalExpenses },
+        ],
+        total: estProfit,
+      },
+    };
+  }
+
+  // 6. Check for AI-10 / AI-11: Ambiguous amounts or missing amounts
   if ((norm.includes('baki dilam') || norm.includes('বাকি দিলাম')) && !/\d+/.test(norm)) {
     return {
       text: 'আপনি কত টাকা বাকি দিতে চান তা অনুগ্রহ করে উল্লেখ করুন (যেমন: রহিম কে ৫০০ টাকা বাকি দিলাম)।',
     };
   }
 
-  // 4. Case: getCustomerBalances ("Kar kache sob theke beshi baki ache?")
-  if (
-    norm.includes('beshi baki') ||
-    norm.includes('বেশি বাকি') ||
-    norm.includes('কার কাছে বাকি') ||
-    norm.includes('who owes')
-  ) {
-    const res = await executeTool('getCustomerBalances', { limit: 5, order: 'desc' }, shopData, queryText);
-    const top = res.items;
-
-    let text = '';
-    if (top.length === 0) {
-      text = 'আলহামদুলিল্লাহ, আপনার দোকানে বর্তমানে কারও কাছে কোনো বকেয়া বাকি নেই।';
-    } else {
-      const topName = top[0].name;
-      const topBal = top[0].balance.toLocaleString('en-BD');
-      const totalOut = res.totalOutstanding.toLocaleString('en-BD');
-
-      text = `আপনার দোকানে মোট বকেয়া বাকি ৳${totalOut}। সবচেয়ে বেশি বাকি রয়েছে ${topName}-এর কাছে ৳${topBal}।`;
-      if (top.length > 1) {
-        text += ` এরপর ${top.slice(1).map((c) => `${c.name} ৳${c.balance.toLocaleString('en-BD')}`).join(', ')}।`;
-      }
-    }
-
-    return {
-      text,
-      verifiedData: {
-        title: 'Customer Baki Balances (বাকিদারদের তালিকা)',
-        items: top.map((c) => ({
-          name: c.name,
-          balance: c.balance,
-          phoneLast4: c.phoneLast4,
-        })),
-        total: res.totalOutstanding,
-      },
-    };
-  }
-
-  // 5. Case: getTodaySales ("Aj koto bikri holo?" / "How much did I sell today?")
-  if (
-    norm.includes('koto bikri') ||
-    norm.includes('কত বিক্রি') ||
-    norm.includes('ajker bikri') ||
-    norm.includes('আজকের বিক্রি') ||
-    norm.includes('sell today') ||
-    norm.includes('today sales')
-  ) {
-    const isEnglish = norm.includes('sell today') || norm.includes('today sales') || norm.includes('how much');
-    const res = await executeTool('getTodaySales', {}, shopData, queryText);
-
-    if (isEnglish) {
-      return {
-        text: `Today's total sales are ৳${res.totalSales.toLocaleString('en-BD')} across ${res.saleCount} transaction(s) (Cash: ৳${res.cashTotal.toLocaleString('en-BD')}, Baki: ৳${res.bakiTotal.toLocaleString('en-BD')}).`,
-        verifiedData: {
-          title: "Today's Sales Breakdown",
-          items: [
-            { label: 'Cash (নগদ)', amount: res.cashTotal },
-            { label: 'Mobile Banking', amount: res.mobileBankingTotal },
-            { label: 'Baki (বাকি)', amount: res.bakiTotal },
-          ],
-          total: res.totalSales,
-        },
-      };
-    }
-
-    return {
-      text: `আজ মোট বিক্রি হয়েছে ৳${res.totalSales.toLocaleString('en-BD')} (${res.saleCount} টি বিক্রি)। নগদ: ৳${res.cashTotal.toLocaleString('en-BD')}, বাকি: ৳${res.bakiTotal.toLocaleString('en-BD')}।`,
-      verifiedData: {
-        title: 'আজকের বিক্রির হিসাব',
-        items: [
-          { label: 'নগদ বিক্রি', amount: res.cashTotal },
-          { label: 'মোবাইল ব্যাংকিং', amount: res.mobileBankingTotal },
-          { label: 'বাকি বিক্রি', amount: res.bakiTotal },
-        ],
-        total: res.totalSales,
-      },
-    };
-  }
-
-  // 6. Case: getLowStock ("Ki ki jinis shesh hoye ashche?")
-  if (
-    norm.includes('shesh') ||
-    norm.includes('শেষ') ||
-    norm.includes('low stock') ||
-    norm.includes('স্টক শেষ') ||
-    norm.includes('kom stock')
-  ) {
-    const res = await executeTool('getLowStock', {}, shopData, queryText);
-    if (res.items.length === 0) {
-      return {
-        text: 'আপনার দোকানের সকল পণ্যের পর্যাপ্ত স্টক রয়েছে। কোনো পণ্য সতর্কতা মাত্রার নিচে নেই।',
-      };
-    }
-
-    const itemNames = res.items.map((i) => `${i.productName} (${i.stockQty} ${i.unit})`).join(', ');
-    return {
-      text: `নিচের পণ্যগুলোর স্টক কমে এসেছে: ${itemNames}। দ্রুত নতুন পণ্য ক্রয় করার পরামর্শ দেওয়া হচ্ছে।`,
-      verifiedData: {
-        title: 'Low Stock Alerts (মজুদ সতর্কতা)',
-        items: res.items.map((i) => ({
-          name: i.productName,
-          stockQty: i.stockQty,
-          unit: i.unit,
-        })),
-      },
-    };
-  }
-
   // 7. Case: proposeBakiEntry ("Rahim ke 500 taka baki dilam" / "রহিম কে ৫০০ টাকা বাকি দিলাম")
   if (norm.includes('baki dilam') || norm.includes('বাকি দিলাম') || norm.includes('baki deoya')) {
-    // Extract numbers
     const numMatch = norm.match(/\d+/);
     const amount = numMatch ? parseInt(numMatch[0], 10) : 0;
 
-    // Extract potential customer name from normalized query (where Bengali digits are converted)
     let custName = norm
       .replace(/কে|ke|taka|টাকা|baki|বাকি|dilam|দিলাম|\d+/gi, '')
       .trim();
@@ -509,8 +645,182 @@ export async function processAssistantQuery(queryText, shopData) {
     };
   }
 
-  // Default fallback answer
+  // 9. Case: Individual Customer Balance Lookup (e.g. "Karim er baki koto?", "রহিমের হিসাব কত?")
+  const customerMatch = customers.find((c) => matchName(c.name, norm));
+  if (customerMatch && (norm.includes('baki') || norm.includes('বাকি') || norm.includes('hisab') || norm.includes('হিসাব') || norm.includes('balance'))) {
+    const bal = customerMatch.balance || 0;
+    const phoneInfo = customerMatch.phone ? `(…${customerMatch.phone.slice(-4)})` : '';
+    if (bal > 0) {
+      return {
+        text: `${customerMatch.name} ${phoneInfo}-এর বর্তমান বকেয়া বাকি ৳${bal.toLocaleString('en-BD')}।`,
+        verifiedData: {
+          title: `গ্রাহকের খাতা: ${customerMatch.name}`,
+          items: [
+            { label: 'বর্তমান বকেয়া বাকি', amount: bal },
+          ],
+          total: bal,
+        },
+      };
+    } else {
+      return {
+        text: `${customerMatch.name} ${phoneInfo}-এর কাছে বর্তমানে কোনো বকেয়া বাকি নেই। হিসাব সম্পূর্ণ পরিশোধিত।`,
+      };
+    }
+  }
+
+  // 10. Case: getCustomerBalances ("Kar kache sob theke beshi baki ache?" / "Who owes most?")
+  if (
+    norm.includes('beshi baki') ||
+    norm.includes('বেশি বাকি') ||
+    norm.includes('কার কাছে বাকি') ||
+    norm.includes('সবচেয়ে বেশি বাকি') ||
+    norm.includes('বাকিদার') ||
+    norm.includes('who owes')
+  ) {
+    const res = await executeTool('getCustomerBalances', { limit: 5, order: 'desc' }, shopData, queryText);
+    const top = res.items;
+
+    let text = '';
+    if (top.length === 0) {
+      text = 'আলহামদুলিল্লাহ, আপনার দোকানে বর্তমানে কারও কাছে কোনো বকেয়া বাকি নেই।';
+    } else {
+      const topName = top[0].name;
+      const topBal = top[0].balance.toLocaleString('en-BD');
+      const totalOut = res.totalOutstanding.toLocaleString('en-BD');
+
+      text = `আপনার দোকানে মোট বকেয়া বাকি ৳${totalOut}। সবচেয়ে বেশি বাকি রয়েছে ${topName}-এর কাছে ৳${topBal}।`;
+      if (top.length > 1) {
+        text += ` এরপর ${top.slice(1).map((c) => `${c.name} ৳${c.balance.toLocaleString('en-BD')}`).join(', ')}।`;
+      }
+    }
+
+    return {
+      text,
+      verifiedData: {
+        title: 'Customer Baki Balances (বাকিদারদের তালিকা)',
+        items: top.map((c) => ({
+          name: c.name,
+          balance: c.balance,
+          phoneLast4: c.phoneLast4,
+        })),
+        total: res.totalOutstanding,
+      },
+    };
+  }
+
+  // 11. Case: Product Price & Stock Inquiry (getProductInfo: "চিনির দাম কত?", "চাল আছে কি?")
+  if (
+    norm.includes('dam koto') ||
+    norm.includes('দাম কত') ||
+    norm.includes('stock koto') ||
+    norm.includes('স্টক কত') ||
+    norm.includes('price') ||
+    norm.includes('rate') ||
+    norm.includes('কিনা') ||
+    norm.includes('আছে কি')
+  ) {
+    // Extract product candidate name
+    const cleaned = norm
+      .replace(/[?.,!]/g, '')
+      .replace(/er|এর|dam|দাম|koto|কত|stock|স্টক|ache|আছে|ki|কিনা|price|rate|please|বলুন/gi, '')
+      .replace(/(র|এর|er)$/, '')
+      .trim();
+
+    const res = await executeTool('getProductInfo', { productName: cleaned || norm }, shopData, queryText);
+    if (res.status === 'found' && res.matches.length > 0) {
+      const p = res.matches[0];
+      return {
+        text: `${p.name}-এর বিক্রয়মূল্য প্রতি ${p.unit} ৳${p.sellPrice.toLocaleString('en-BD')}। বর্তমান মজুদ রয়েছে ${p.stockQty} ${p.unit}।`,
+        verifiedData: {
+          title: `পণ্যের বিবরণ: ${p.name}`,
+          items: [
+            { label: 'বিক্রয় মূল্য', amount: p.sellPrice },
+            { label: `বর্তমান স্টক (${p.unit})`, amount: p.stockQty },
+          ],
+        },
+      };
+    }
+  }
+
+  // 12. Case: getTodaySales ("Aj koto bikri holo?" / "How much did I sell today?")
+  if (
+    norm.includes('koto bikri') ||
+    norm.includes('কত বিক্রি') ||
+    norm.includes('ajker bikri') ||
+    norm.includes('আজকের বিক্রি') ||
+    norm.includes('বিক্রি কত') ||
+    norm.includes('sell today') ||
+    norm.includes('today sales')
+  ) {
+    const isEnglish = norm.includes('sell today') || norm.includes('today sales') || norm.includes('how much');
+    const res = await executeTool('getTodaySales', {}, shopData, queryText);
+
+    if (isEnglish) {
+      return {
+        text: `Today's total sales are ৳${res.totalSales.toLocaleString('en-BD')} across ${res.saleCount} transaction(s) (Cash: ৳${res.cashTotal.toLocaleString('en-BD')}, Baki: ৳${res.bakiTotal.toLocaleString('en-BD')}).`,
+        verifiedData: {
+          title: "Today's Sales Breakdown",
+          items: [
+            { label: 'Cash (নগদ)', amount: res.cashTotal },
+            { label: 'Mobile Banking', amount: res.mobileBankingTotal },
+            { label: 'Baki (বাকি)', amount: res.bakiTotal },
+          ],
+          total: res.totalSales,
+        },
+      };
+    }
+
+    return {
+      text: `আজ মোট বিক্রি হয়েছে ৳${res.totalSales.toLocaleString('en-BD')} (${res.saleCount} টি বিক্রি)। নগদ: ৳${res.cashTotal.toLocaleString('en-BD')}, বাকি: ৳${res.bakiTotal.toLocaleString('en-BD')}।`,
+      verifiedData: {
+        title: 'আজকের বিক্রির হিসাব',
+        items: [
+          { label: 'নগদ বিক্রি', amount: res.cashTotal },
+          { label: 'মোবাইল ব্যাংকিং', amount: res.mobileBankingTotal },
+          { label: 'বাকি বিক্রি', amount: res.bakiTotal },
+        ],
+        total: res.totalSales,
+      },
+    };
+  }
+
+  // 13. Case: getLowStock ("Ki ki jinis shesh hoye ashche?")
+  if (
+    norm.includes('shesh') ||
+    norm.includes('শেষ') ||
+    norm.includes('low stock') ||
+    norm.includes('স্টক শেষ') ||
+    norm.includes('kom stock')
+  ) {
+    const res = await executeTool('getLowStock', {}, shopData, queryText);
+    if (res.items.length === 0) {
+      return {
+        text: 'আপনার দোকানের সকল পণ্যের পর্যাপ্ত স্টক রয়েছে। কোনো পণ্য সতর্কতা মাত্রার নিচে নেই।',
+      };
+    }
+
+    const itemNames = res.items.map((i) => `${i.productName} (${i.stockQty} ${i.unit})`).join(', ');
+    return {
+      text: `নিচের পণ্যগুলোর স্টক কমে এসেছে: ${itemNames}। দ্রুত নতুন পণ্য ক্রয় করার পরামর্শ দেওয়া হচ্ছে।`,
+      verifiedData: {
+        title: 'Low Stock Alerts (মজুদ সতর্কতা)',
+        items: res.items.map((i) => ({
+          name: i.productName,
+          stockQty: i.stockQty,
+          unit: i.unit,
+        })),
+      },
+    };
+  }
+
+  // Default fallback: Friendly, contextual guidance
   return {
-    text: 'আমি আপনার কথা বুঝতে পেরেছি। বিক্রি, বাকি বা স্টক জানতে উদাহরণ প্রশ্নগুলোতে চাপ দিন অথবা স্পষ্ট করে বলুন (যেমন: "আজ কত বিক্রি হলো?" বা "রহিম কে ৫০০ টাকা বাকি দিলাম")।',
+    text: `আমি আপনার হিসাববন্ধু। আমি আপনাকে নিচের বিষয়গুলোতে সাহায্য করতে পারি:
+• আজকের মোট বিক্রি বা লাভ জানতে ("আজ কত বিক্রি হলো?" বা "আজকের লাভ কত?")
+• বাকিদারদের হিসাব বা নির্দিষ্ট গ্রাহকের বাকি জানতে ("কার কাছে বেশি বাকি?" বা "করিমের বাকি কত?")
+• পণ্যের দর ও স্টক জানতে ("চিনির দাম কত?" বা "কি কি জিনিস শেষ?")
+• মুখে বলে বাকি বা জমা লিখতে ("রহিম কে ৫০০ টাকা বাকি দিলাম" বা "করিম ২০০ টাকা দিলো")
+
+আপনি কী জানতে চান?`,
   };
 }

@@ -50,6 +50,12 @@ export function matchName(candidateName = '', query = '', aliases = []) {
   if (normCandidate === normQuery) return true;
   if (normCandidate.includes(normQuery) || normQuery.includes(normCandidate)) return true;
 
+  // Check stem without genitive suffixes (e.g. চিনির -> চিনি, রহিমের -> রহিম)
+  const stemQuery = normQuery.replace(/(র|এর|er)$/, '');
+  if (stemQuery && stemQuery.length >= 2 && (normCandidate.includes(stemQuery) || stemQuery.includes(normCandidate))) {
+    return true;
+  }
+
   // Check custom aliases
   if (Array.isArray(aliases)) {
     for (const alias of aliases) {

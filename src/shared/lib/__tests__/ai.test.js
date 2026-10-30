@@ -110,4 +110,35 @@ describe('Phase 5 Gemini Integration & AI Evaluation Cases (AI_Test_Cases.md)', 
     );
     expect(toolRes.status).toBe('invalid');
   });
+
+  it('AI-21: Handles natural greetings and identity questions warmly', async () => {
+    const res = await processAssistantQuery('আসসালামু আলাইকুম, কেমন আছেন?', mockShopData);
+    expect(res.text).toContain('হিসাববন্ধু');
+    expect(res.text).toContain('ডিজিটাল খাতা');
+  });
+
+  it('AI-22: Answers shopkeeper business improvement and advice queries', async () => {
+    const res = await processAssistantQuery('দোকানের বিক্রি বাড়ানোর উপায় কি?', mockShopData);
+    expect(res.text).toContain('পরামর্শ');
+    expect(res.text).toContain('স্টক');
+  });
+
+  it('AI-23: Answers today profit and expense questions with verified data', async () => {
+    const res = await processAssistantQuery('আজকের লাভ কত হয়েছে?', mockShopData);
+    expect(res.text).toContain('লাভ');
+    expect(res.verifiedData).toBeDefined();
+    expect(res.verifiedData.title).toContain('লাভ-ক্ষতির হিসাব');
+  });
+
+  it('AI-24: Answers individual customer balance inquiries', async () => {
+    const res = await processAssistantQuery('করিমের বাকি কত?', mockShopData);
+    expect(res.text).toContain('Karim Mia');
+    expect(res.text).toContain('1,200');
+  });
+
+  it('AI-25: Answers product price and stock inquiries', async () => {
+    const res = await processAssistantQuery('চালের দাম কত?', mockShopData);
+    expect(res.text).toContain('Rice');
+    expect(res.text).toContain('70');
+  });
 });

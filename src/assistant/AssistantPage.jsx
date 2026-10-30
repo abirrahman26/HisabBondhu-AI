@@ -105,7 +105,7 @@ export default function AssistantPage() {
         sales,
         ledger,
         expenses,
-      });
+      }, messages);
 
       setMessages((prev) => [
         ...prev,
